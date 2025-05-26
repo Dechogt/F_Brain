@@ -1,0 +1,61 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Service Django/Gunicorn
+  - job_name: 'django-web'
+    static_configs:
+      - targets: ['web:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Service Nginx
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # PostgreSQL via postgres-exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # RabbitMQ Management API
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+  # Node exporter (si vous en ajoutez un pour les métriques système)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+  # Celery (si vous configurez un exporter pour Celery)
+  - job_name: 'celery'
+    static_configs:
+      - targets: ['celery:9540']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+
+# Configuration pour les alertes (optionnel)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
