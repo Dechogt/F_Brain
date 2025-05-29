@@ -11,4 +11,5 @@ COPY . .
 
 EXPOSE 5173
 
-CMD ["yarn", "dev"]
+# Commande pour démarrer le serveur de développement
+CMD ["yarn", "dev", "--host", "0.0.0.0", "--port", "5173"]

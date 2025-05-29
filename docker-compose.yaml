@@ -1,6 +1,6 @@
 networks:
   backend:
-    driver: bridge # isolation du trafic inter-services
+    driver: bridge 
 
 volumes:
   pgdata:
@@ -8,18 +8,18 @@ volumes:
   grafana_data:
 
 services:
-  nginx:
-    build:
-      context: ./proxy
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    networks: [backend]
-    depends_on:
-      - frontend
-      - web
+  # nginx:
+  #   build:
+  #     context: ./proxy
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   networks: [backend]
+  #   depends_on:
+  #     - frontend
+  #     - web
 
   rabbitmq:
     image: rabbitmq:4-management
@@ -45,6 +45,7 @@ services:
     environment:
       GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-admin}
+      GF_SERVER_ROOT_URL: http://localhost:3000
     volumes:
       - ./grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana_data:/var/lib/grafana
@@ -94,8 +95,8 @@ services:
         gunicorn server_config.wsgi:application --bind 0.0.0.0:8000
       "
     networks: [backend]
-    expose:
-      - "8000"
+    ports:
+      - "8000:8000"  
     depends_on:
       db:
         condition: service_healthy
@@ -118,8 +119,8 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    expose:
-      - "4173"
+    ports:
+      - "5173:5173"  # Ajout du port pour accès direct
     networks: [backend]
 
   postgres-exporter:
