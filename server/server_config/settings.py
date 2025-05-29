@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_prometheus',
     'django_celery_results',
     'django_celery_beat',
+    'gameur',
 ]
 
 MIDDLEWARE = [
@@ -89,9 +90,9 @@ WSGI_APPLICATION = 'server_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'devops_db'),
-        'USER': os.getenv('POSTGRES_USER', 'devops_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'devops_pass'),
+        'NAME': os.getenv('POSTGRES_DB', 'gaming_db'),
+        'USER': os.getenv('POSTGRES_USER', 'Decho'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'decho1234'),
         'HOST': os.getenv('POSTGRES_HOST', 'db'),
         'PORT': 5432,
     }
