@@ -8,18 +8,18 @@ volumes:
   grafana_data:
 
 services:
-  # nginx:
-  #   build:
-  #     context: ./proxy
-  #     dockerfile: Dockerfile
-  #   restart: unless-stopped
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   networks: [backend]
-  #   depends_on:
-  #     - frontend
-  #     - web
+  nginx:
+    build:
+      context: ./proxy
+      dockerfile: Dockerfile
+    restart: on-failure
+    ports:
+      - "80:80"
+      - "443:443"
+    networks: [backend]
+    depends_on:
+      - frontend
+      - web
 
   rabbitmq:
     image: rabbitmq:4-management
@@ -47,7 +47,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:-admin}
       GF_SERVER_ROOT_URL: http://localhost:3000
     volumes:
-      - ./grafana.ini:/etc/grafana/grafana.ini:ro
+      
       - grafana_data:/var/lib/grafana
     networks: [backend]
     depends_on:
@@ -88,12 +88,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    env_file: .env
-    command: >
-      sh -c "
-        python manage.py migrate &&
-        gunicorn server_config.wsgi:application --bind 0.0.0.0:8000
-      "
+    command: 
+      gunicorn server_config.wsgi:application --bind 0.0.0.0:8000
     networks: [backend]
     ports:
       - "8000:8000"  
@@ -102,12 +98,10 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-
   celery:
     build:
       context: ./server
       dockerfile: Dockerfile
-    env_file: .env
     command: celery -A server_config worker --loglevel=info
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -123,17 +117,17 @@ services:
       - "5173:5173"  # Ajout du port pour accès direct
     networks: [backend]
 
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter
-    env_file: .env
-    environment:
-      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable"
-    ports:
-      - "9187:9187"
-    networks: [backend]
-    depends_on:
-      db:
-        condition: service_healthy
+  # postgres-exporter:
+  #   image: prometheuscommunity/postgres-exporter
+  #   env_file: .env
+  #   environment:
+  #     DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable"
+  #   ports:
+  #     - "9187:9187"
+  #   networks: [backend]
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
   # node-exporter:
   #   image: prom/node-exporter:latest
