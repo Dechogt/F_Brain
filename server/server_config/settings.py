@@ -35,7 +35,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'web',  # Nom du service Docker
     '0.0.0.0',
-    # Ajoutez d'autres domaines si nécessaire
+    
 ]
 
 
@@ -83,7 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'server_config.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
@@ -97,7 +96,6 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -134,6 +132,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',
+#     # ou pour les anciennes versions : os.path.join(BASE_DIR, 'static'),
+# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
