@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'django_prometheus',
     'django_celery_results',
     'django_celery_beat',
+    'gameur',
 ]
 
 MIDDLEWARE = [
@@ -129,10 +130,19 @@ USE_I18N = True
 USE_TZ = True
 
 
+
+# Chemin ABSOLU où collectstatic copiera les fichiers
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')  # Créera un dossier `static/` à la racine
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# Dossiers supplémentaires où Django cherche les statiques
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'myapp/static'),  # Si vous avez une app "myapp"
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
