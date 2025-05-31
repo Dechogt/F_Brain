@@ -12,7 +12,7 @@ services:
     build:
       context: ./proxy
       dockerfile: Dockerfile
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -90,6 +90,10 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+    volumes:
+      - ./server:/app
+      - ./server/static:/app/static
+    
     command: 
       gunicorn server_config.wsgi:application --bind 0.0.0.0:8000
     networks: [backend]
@@ -114,7 +118,9 @@ services:
   frontend:
     build:
       context: ./client
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile 
+    # volumes:
+    #   - ./client:/app
     ports:
       - "5173:5173"  
     networks: [backend]

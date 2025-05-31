@@ -139,15 +139,8 @@ STATIC_URL = '/static/'
 
 # Dossiers supplémentaires où Django cherche les statiques
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'myapp/static'),  # Si vous avez une app "myapp"
+    os.path.join(BASE_DIR, 'gameur/static'),  # Si vous avez une app "
 ]
-
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'static',
-#     # ou pour les anciennes versions : os.path.join(BASE_DIR, 'static'),
-# ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
