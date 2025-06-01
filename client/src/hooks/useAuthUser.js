@@ -4,8 +4,8 @@ import axios from 'axios'
 
 const useAuthUser = () => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0()
-  const [userData, setUserData] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -15,28 +15,28 @@ const useAuthUser = () => {
       }
 
       try {
-        const token = await getAccessTokenSilently()
+        const token = await getAccessTokenSilently();
         const { data } = await axios.get('/api/user', {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setUserData(data)
       } catch (error) {
         console.error('Error fetching user data:', error)
       } finally {
         setLoading(false)
       }
-    }
+    };
 
-    fetchUserData()
+    fetchUserData();
   }, [isAuthenticated, user?.sub, getAccessTokenSilently])
 
-  return { 
-    user: { ...user, ...userData }, 
-    isAuthenticated, 
-    loading 
-  }
-}
+  return {
+    user: { ...user, ...userData },
+    isAuthenticated,
+    loading,
+  };
+};
 
 export default useAuthUser

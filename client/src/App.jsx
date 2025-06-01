@@ -9,18 +9,18 @@ import { Sidebar } from './components/Layout/Sidebar'
 import { Navbar } from './components/Layout/Navbar'
 
 // Pages
-import { HomePage } from './pages/HomePage'
+import  { HomePage }  from './pages/HomePage.jsx'
 import { LoginPage } from './pages/LoginPage'
 import { RankingPage } from './pages/RankingPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { ProtectedRoute } from './ProtectedRoute'
 
 // Hooks
-import { useAuth } from './contexts'
+import { useAuthUser } from './hooks/useAuthUser.js'
 
 function App() {
   const { isLoading } = useAuth0()
-  const { isInitialized } = useAuth()
+  const { isInitialized } = useAuthUser()
 
   // Affichage du loading pendant l'initialisation
   if (isLoading || !isInitialized) {

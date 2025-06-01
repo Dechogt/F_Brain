@@ -2,6 +2,7 @@ import { Box, Typography, Button, Grid, useTheme } from '@mui/material'
 import { motion } from 'framer-motion'
 import GameCarousel from '../components/Gaming/GameCarousel'
 import GamerGrid from '../components/Gaming/GamerGrid'
+import StatsCounter from '../components/Gaming/StatsCounter'
 // import GameStats from '../components/Gaming/GameStats'
 
 const HomePage = () => {

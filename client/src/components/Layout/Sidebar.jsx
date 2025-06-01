@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {
   Drawer,
   List,
@@ -16,7 +16,7 @@ import {
   Chip,
   useTheme,
   useMediaQuery,
-} from '@mui/material';
+} from '@mui/material'
 import {
   Home,
   Leaderboard,
@@ -29,21 +29,21 @@ import {
   ChevronLeft,
   ChevronRight,
   Logout,
-} from '@mui/icons-material';
-import { useAuth } from '../../contexts';
+} from '@mui/icons-material'
+import { useAuth } from '../../hooks/useAuth.js'
 
-const DRAWER_WIDTH = 280;
-const DRAWER_WIDTH_COLLAPSED = 70;
+const DRAWER_WIDTH = 280
+const DRAWER_WIDTH_COLLAPSED = 70
 
 export const Sidebar = () => {
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const theme = useTheme()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const { user, isAuthenticated, logout } = useAuth()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   // Menu items avec icônes gaming
   const menuItems = [
@@ -169,7 +169,7 @@ export const Sidebar = () => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              Gaming Hub
+              Gaming Followers
             </Typography>
             <Typography variant="caption" color="text.secondary">
               v1.0.0

@@ -28,7 +28,7 @@ import {
   SportsEsports,
   EmojiEvents,
 } from '@mui/icons-material'
-import { useAuth, useTheme as useCustomTheme } from '../../contexts'
+import { useAuth, useTheme as useCustomTheme } from '../../hooks'
 import LoginButton from '../Auth/LoginButton'
 import LogoutButton from '../Auth/LogoutButton'
 import Profile from '../Auth/Profile'
@@ -45,7 +45,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-  };
+  }
 
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
