@@ -1,15 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const GameContext = createContext();
-
-export const useGame = () => {
-  const context = useContext(GameContext);
-  if (!context) {
-    throw new Error('useGame must be used within a GameProvider');
-  }
-  return context;
-};
 
 export const GameContextProvider = ({ children }) => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
@@ -32,8 +24,8 @@ export const GameContextProvider = ({ children }) => {
     { id: 'mmo', name: 'MMO', icon: '🌍', color: '#673AB7' },
   ];
 
-  // Récupérer le profil utilisateur
-  const fetchUserProfile = async () => {
+  // Récupérer le profil utilisateur avec useCallback
+  const fetchUserProfile = useCallback(async () => {
     if (!isAuthenticated || !user) return;
 
     try {
@@ -57,10 +49,10 @@ export const GameContextProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
-  // Récupérer la liste des gamers pour le classement
-  const fetchGamers = async () => {
+  // Récupérer la liste des gamers pour le classement avec useCallback
+  const fetchGamers = useCallback(async () => {
     try {
       setLoading(true);
       const token = isAuthenticated ? await getAccessTokenSilently() : null;
@@ -87,7 +79,7 @@ export const GameContextProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, getAccessTokenSilently]);
 
   // Mettre à jour le profil utilisateur
   const updateUserProfile = async (profileData) => {
@@ -140,13 +132,13 @@ export const GameContextProvider = ({ children }) => {
     return 'Bronze';
   };
 
-  // Charger les données au montage si authentifié
+  // Charger les données au montage
   useEffect(() => {
     if (isAuthenticated) {
       fetchUserProfile();
     }
     fetchGamers();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchUserProfile, fetchGamers]);
 
   const value = {
     // États

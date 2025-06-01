@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import GameBadge from '../components/Gaming/GameBadge'
 
-const Profile = () => {
+const ProfilePage = () => {
   const { user } = useAuth0()
   const [tabValue, setTabValue] = useState(0)
 
@@ -63,4 +63,4 @@ const Profile = () => {
   )
 }
 
-export default Profile
+export default ProfilePage

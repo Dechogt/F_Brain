@@ -1,9 +1,10 @@
 import { Box, Typography, Button, Grid, useTheme } from '@mui/material'
 import { motion } from 'framer-motion'
 import GameCarousel from '../components/Gaming/GameCarousel'
-import StatsCounter from '../components/Gaming/StatsCounter'
+import GamerGrid from '../components/Gaming/GamerGrid'
+// import GameStats from '../components/Gaming/GameStats'
 
-const Home = () => {
+const HomePage = () => {
   const theme = useTheme()
 
   return (
@@ -62,10 +63,10 @@ const Home = () => {
         <Typography variant="h4" align="center" sx={{ mb: 4 }}>
           Les meilleurs joueurs du moment
         </Typography>
-        {/* Ici vous intégrerez le composant GamerGrid */}
+        <GamerGrid />
       </Box>
     </Box>
   )
 }
 
-export default Home
+export default HomePage

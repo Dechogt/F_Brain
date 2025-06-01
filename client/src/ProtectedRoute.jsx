@@ -1,29 +1,34 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { Box, Typography, Button } from '@mui/material';
-import { LoginOutlined, SecurityOutlined } from '@mui/icons-material';
-import { useAuth } from '../contexts';
-import { LoadingSpinner } from './LoadingSpinner';
+import React from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
+import { Box, Typography, Button } from '@mui/material'
+import { LoginOutlined, SecurityOutlined } from '@mui/icons-material'
+import LoadingSpinner from './LoadingSpinner'
 
-export const ProtectedRoute = ({ 
-  children, 
-  requiredRole = null, 
-  requiredPermission = null 
+const NAMESPACE = import.meta.env.VITE_AUTH0_NAMESPACE
+const ProtectedRoute = ({
+  children,
+  requiredRole = null,
+  requiredPermission = null,
 }) => {
-  const { user, isAuthenticated, isLoading, login, hasRole, hasPermission } = useAuth();
-  const location = useLocation();
+  const { isAuthenticated, isLoading, user } = useAuth0()
+  const location = useLocation()
 
-  // Chargement en cours
+  // Namespace personnalisé pour les claims Auth0 (à adapter à ta config)
+  const roles = user?.[`${NAMESPACE}/roles`] || []
+  const permissions = user?.[`${NAMESPACE}/permissions`] || []
+
+  const hasRole = (role) => roles.includes(role)
+  const hasPermission = (permission) => permissions.includes(permission)
+
   if (isLoading) {
-    return <LoadingSpinner message="Vérification des permissions..." />;
+    return <LoadingSpinner message="Vérification des permissions..." />
   }
 
-  // Non authentifié - redirection vers login
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  // Vérification du rôle requis
   if (requiredRole && !hasRole(requiredRole)) {
     return (
       <Box
@@ -38,25 +43,19 @@ export const ProtectedRoute = ({
         }}
       >
         <SecurityOutlined sx={{ fontSize: 80, color: 'error.main' }} />
-        <Typography variant="h4" color="error.main" gutterBottom>
+        <Typography variant="h4" color="error.main">
           Accès refusé
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
-          Vous n'avez pas les permissions nécessaires pour accéder à cette page.
+        <Typography variant="body1" color="text.secondary">
           Rôle requis : <strong>{requiredRole}</strong>
         </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => window.history.back()}
-          sx={{ mt: 2 }}
-        >
+        <Button variant="outlined" onClick={() => window.history.back()}>
           Retour
         </Button>
       </Box>
     );
   }
 
-  // Vérification de la permission requise
   if (requiredPermission && !hasPermission(requiredPermission)) {
     return (
       <Box
@@ -71,63 +70,20 @@ export const ProtectedRoute = ({
         }}
       >
         <SecurityOutlined sx={{ fontSize: 80, color: 'warning.main' }} />
-        <Typography variant="h4" color="warning.main" gutterBottom>
+        <Typography variant="h4" color="warning.main">
           Permission insuffisante
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
-          Vous n'avez pas la permission nécessaire pour cette action.
+        <Typography variant="body1" color="text.secondary">
           Permission requise : <strong>{requiredPermission}</strong>
         </Typography>
-        <Button
-          variant="outlined"
-          onClick={() => window.history.back()}
-          sx={{ mt: 2 }}
-        >
+        <Button variant="outlined" onClick={() => window.history.back()}>
           Retour
         </Button>
       </Box>
     );
   }
 
-  // Utilisateur authentifié et autorisé
-  return children;
+  return children
 };
 
-// Composant pour afficher la page de login avec redirection
-export const LoginRequired = () => {
-  const { login } = useAuth();
-  const location = useLocation();
-
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '60vh',
-        textAlign: 'center',
-        gap: 3,
-      }}
-    >
-      <LoginOutlined sx={{ fontSize: 80, color: 'primary.main' }} />
-      <Typography variant="h4" color="primary.main" gutterBottom>
-        Connexion requise
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
-        Vous devez être connecté pour accéder à cette page.
-      </Typography>
-      <Button
-        variant="contained"
-        size="large"
-        onClick={() => login()}
-        startIcon={<LoginOutlined />}
-        sx={{ mt: 2 }}
-      >
-        Se connecter
-      </Button>
-    </Box>
-  );
-};
-
-export default ProtectedRoute;
+export default ProtectedRoute

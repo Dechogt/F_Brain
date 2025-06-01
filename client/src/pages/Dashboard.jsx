@@ -16,7 +16,7 @@ const Dashboard = () => {
       </Typography>
       
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-        <GameProgress 
+        <GameProgress
           game="Valorant" 
           level={stats?.valorantLevel || 0} 
           progress={stats?.valorantProgress || 0} 

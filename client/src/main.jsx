@@ -1,12 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { Auth0Provider } from '@auth0/auth0-react';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import App from './App.jsx';
-import { theme } from './styles/theme.js';
-import { AppProviders } from './contexts';
-import './index.css';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { Auth0Provider } from '@auth0/auth0-react'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import App from './App.jsx'
+import { theme } from './styles/theme.js'
+import { AppProviders } from './contexts/index.jsx'
+import './index.css'
 
 // Configuration Auth0
 const auth0Config = {

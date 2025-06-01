@@ -75,3 +75,16 @@ const Leaderboard = () => {
 }
 
 export default Leaderboard
+
+// // Exemple d'utilisation dans Leaderboard.jsx Ceci est un exemple de code pour une page de classement de joueurs dans une application de jeu. Il utilise Material-UI pour le style et la mise en page, ainsi que le composant DataGrid pour afficher les données des joueurs. Le hook `useLeaderboard` est utilisé pour récupérer les données des joueurs, qui peuvent être filtrées par jeu principal.
+// import GamerGrid from '../components/Gaming/GamerGrid'
+
+// const Leaderboard = () => {
+//   const { gamers, loading } = useLeaderboard()
+  
+//   return (
+//     <Box>
+//       <GamerGrid gamers={gamers} loading={loading} />
+//     </Box>
+//   )
+// }

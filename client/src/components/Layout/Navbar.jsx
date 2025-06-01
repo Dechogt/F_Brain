@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   AppBar,
   Toolbar,
@@ -15,7 +15,7 @@ import {
   Button,
   useTheme,
   useMediaQuery,
-} from '@mui/material';
+} from '@mui/material'
 import {
   Menu as MenuIcon,
   Search,
@@ -27,18 +27,21 @@ import {
   LightMode,
   SportsEsports,
   EmojiEvents,
-} from '@mui/icons-material';
-import { useAuth, useTheme as useCustomTheme } from '../../contexts';
+} from '@mui/icons-material'
+import { useAuth, useTheme as useCustomTheme } from '../../contexts'
+import LoginButton from '../Auth/LoginButton'
+import LogoutButton from '../Auth/LogoutButton'
+import Profile from '../Auth/Profile'
 
 export const Navbar = ({ onMobileMenuToggle }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const { user, isAuthenticated, logout } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useCustomTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const { user, isAuthenticated, logout } = useAuth()
+  const { isDarkMode, toggleDarkMode } = useCustomTheme()
   
   const [anchorEl, setAnchorEl] = useState(null);
-  const [notificationAnchor, setNotificationAnchor] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
+  const [notificationAnchor, setNotificationAnchor] = useState(null)
+  const [searchValue, setSearchValue] = useState('')
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -49,7 +52,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
   };
 
   const handleNotificationOpen = (event) => {
-    setNotificationAnchor(event.currentTarget);
+    setNotificationAnchor(event.currentTarget)
   };
 
   const handleNotificationClose = () => {
@@ -58,7 +61,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
 
   const handleLogout = () => {
     logout();
-    handleProfileMenuClose();
+    handleProfileMenuClose()
   };
 
   // Notifications factices pour la démo
@@ -86,7 +89,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
     },
   ];
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = notifications.filter(n => n.unread).length
 
   return (
     <AppBar
@@ -125,7 +128,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
                 WebkitTextFillColor: 'transparent',
               }}
             >
-              Gaming Hub
+              Gaming Followers
             </Typography>
           </Box>
         )}
@@ -337,12 +340,12 @@ export const Navbar = ({ onMobileMenuToggle }) => {
           </Box>
 
           {/* Menu items */}
-          <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/profile'; }}>
+          <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/profile' }}>
             <Person sx={{ mr: 2, color: 'text.secondary' }} />
             Mon Profil
           </MenuItem>
           
-          <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/settings'; }}>
+          <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/settings' }}>
             <Settings sx={{ mr: 2, color: 'text.secondary' }} />
             Paramètres
           </MenuItem>
@@ -356,7 +359,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
         </Menu>
       </Toolbar>
     </AppBar>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

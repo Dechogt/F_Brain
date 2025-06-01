@@ -1,30 +1,30 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box } from '@mui/material';
-import { useAuth0 } from '@auth0/auth0-react';
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Box } from '@mui/material'
+import { useAuth0 } from '@auth0/auth0-react'
 
 // Components
-import { LoadingSpinner } from './components/LoadingSpinner';
-import { Sidebar } from './components/Sidebar';
-import { TopBar } from './components/TopBar';
+import { LoadingSpinner } from './LoadingSpinner'
+import { Sidebar } from './components/Layout/Sidebar'
+import { Navbar } from './components/Layout/Navbar'
 
 // Pages
-import { HomePage } from './pages/HomePage';
-import { LoginPage } from './pages/LoginPage';
-import { RankingPage } from './pages/RankingPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { HomePage } from './pages/HomePage'
+import { LoginPage } from './pages/LoginPage'
+import { RankingPage } from './pages/RankingPage'
+import { ProfilePage } from './pages/ProfilePage'
+import { ProtectedRoute } from './ProtectedRoute'
 
 // Hooks
-import { useAuth } from './contexts';
+import { useAuth } from './contexts'
 
 function App() {
-  const { isLoading } = useAuth0();
-  const { isInitialized } = useAuth();
+  const { isLoading } = useAuth0()
+  const { isInitialized } = useAuth()
 
   // Affichage du loading pendant l'initialisation
   if (isLoading || !isInitialized) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner />
   }
 
   return (
@@ -35,8 +35,8 @@ function App() {
         
         {/* Contenu principal */}
         <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* TopBar */}
-          <TopBar />
+          {/* Navbar */}
+          <Navbar />
           
           {/* Contenu des pages */}
           <Box
@@ -45,7 +45,7 @@ function App() {
               flexGrow: 1,
               p: 3,
               backgroundColor: 'background.default',
-              minHeight: 'calc(100vh - 64px)', // 64px = hauteur TopBar
+              minHeight: 'calc(100vh - 64px)', // 64px = hauteur Navbar
             }}
           >
             <Routes>
