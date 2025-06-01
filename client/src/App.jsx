@@ -1,35 +1,95 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Box } from '@mui/material';
+import { useAuth0 } from '@auth0/auth0-react';
+
+// Components
+import { LoadingSpinner } from './components/LoadingSpinner';
+import { Sidebar } from './components/Sidebar';
+import { TopBar } from './components/TopBar';
+
+// Pages
+import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { RankingPage } from './pages/RankingPage';
+import { ProfilePage } from './pages/ProfilePage';
+import { ProtectedRoute } from './components/ProtectedRoute';
+
+// Hooks
+import { useAuth } from './contexts';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { isLoading } = useAuth0();
+  const { isInitialized } = useAuth();
+
+  // Affichage du loading pendant l'initialisation
+  if (isLoading || !isInitialized) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Router>
+      <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+        {/* Sidebar */}
+        <Sidebar />
+        
+        {/* Contenu principal */}
+        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          {/* TopBar */}
+          <TopBar />
+          
+          {/* Contenu des pages */}
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              p: 3,
+              backgroundColor: 'background.default',
+              minHeight: 'calc(100vh - 64px)', // 64px = hauteur TopBar
+            }}
+          >
+            <Routes>
+              {/* Routes publiques */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/ranking" element={<RankingPage />} />
+              
+              {/* Routes protégées */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Route 404 */}
+              <Route
+                path="*"
+                element={
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: '50vh',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div>
+                      <h1>404 - Page non trouvée</h1>
+                      <p>La page que vous cherchez n'existe pas.</p>
+                    </div>
+                  </Box>
+                }
+              />
+            </Routes>
+          </Box>
+        </Box>
+      </Box>
+    </Router>
+  );
 }
 
-export default App
+export default App;
