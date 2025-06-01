@@ -1,17 +1,27 @@
-// Ré-export des contextes (version simplifiée)
-export { ThemeContext, ThemeProvider, useTheme } from './ThemeContext'
-export { GameContext, GameProvider, useGame } from './GameContext'
-export { AuthContext, AuthProvider, useAuth } from './AuthContext'
+import React from 'react';
+import { AuthContextProvider } from './AuthContext';
+import { GameContextProvider } from './GameContext';
+import { ThemeContextProvider } from './ThemeContext';
+
+// Export des contexts seulement
+export { default as ThemeContext } from './ThemeContext';
+export { default as GameContext } from './GameContext';
+export { default as AuthContext } from './AuthContext';
+
+// Export des providers seulement
+export { ThemeContextProvider as ThemeProvider } from './ThemeContext';
+export { GameContextProvider as GameProvider } from './GameContext';
+export { AuthContextProvider as AuthProvider } from './AuthContext';
 
 // Provider combiné
 export const AppProviders = ({ children }) => {
   return (
-    <AuthProvider>
-      <GameProvider>
-        <ThemeProvider>
+    <AuthContextProvider>
+      <GameContextProvider>
+        <ThemeContextProvider>
           {children}
-        </ThemeProvider>
-      </GameProvider>
-    </AuthProvider>
-  )
-}
+        </ThemeContextProvider>
+      </GameContextProvider>
+    </AuthContextProvider>
+  );
+};
