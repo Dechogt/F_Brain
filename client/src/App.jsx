@@ -9,14 +9,14 @@ import { Sidebar } from './components/Layout/Sidebar'
 import { Navbar } from './components/Layout/Navbar'
 
 // Pages
-import  { HomePage }  from './pages/HomePage.jsx'
-import { LoginPage } from './pages/LoginPage'
-import { RankingPage } from './pages/RankingPage'
-import { ProfilePage } from './pages/ProfilePage'
-import { ProtectedRoute } from './ProtectedRoute'
+import HomePage from './pages/HomePage.jsx'
+import LoginPage from './pages/LoginPage'
+import RankingPage from './pages/RankingPage'
+import ProfilePage from './pages/ProfilePage'
+import ProtectedRoute from './ProtectedRoute'
 
 // Hooks
-import { useAuthUser } from './hooks/useAuthUser.js'
+import useAuthUser from './hooks/useAuthUser.js'
 
 function App() {
   const { isLoading } = useAuth0()
