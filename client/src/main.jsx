@@ -14,7 +14,8 @@ const auth0Config = {
   clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
   authorizationParams: {
     redirect_uri: window.location.origin,
-    audience: import.meta.env.VITE_AUTH0_AUDIENCE, // Pour ton API Django
+    audience: import.meta.env.VITE_AUTH0_AUDIENCE, // Pour mon API Django
+    scope: import.meta.env.VITE_AUTH0_SCOPE 
   },
   cacheLocation: 'localstorage',
   useRefreshTokens: true,

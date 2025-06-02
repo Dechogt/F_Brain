@@ -1,6 +1,6 @@
 import { Grid, Box, Typography } from '@mui/material'
 import GamerCard from './GamerCard'
-import LoadingSpinner from '../../LoadingSpinner'
+import LoadingSpinner from '../Common/LoadingSpinner'
 
 const GamerGrid = ({ gamers, loading }) => {
   if (loading) return <LoadingSpinner />
