@@ -93,10 +93,10 @@ WSGI_APPLICATION = 'server_config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'gaming_db'),
-        'USER': os.getenv('POSTGRES_USER', 'Decho'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'decho1234'),
-        'HOST': os.getenv('POSTGRES_HOST', 'db'),
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
         'PORT': 5432,
     }
 }
@@ -127,6 +127,11 @@ CORS_ALLOWED_ORIGINS = [
 # Comme j'utilise les credentials (outils ou cookies) pour les requêtes CORS, il faut activer cette option 
 CORS_ALLOW_CREDENTIALS = True
 
+
+# Configuration Auth0 pour validation manuelle
+AUTH0_DOMAIN = os.getenv('VITE_AUTH0_DOMAIN') # Ton domaine Auth0
+AUTH0_API_AUDIENCE = os.getenv('VITE_AUTH0_AUDIENCE') # L'audience de ton API
+AUTH0_JWKS_URL = f'https://{AUTH0_DOMAIN}/.well-known/jwks.json' # URL JWKSw
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

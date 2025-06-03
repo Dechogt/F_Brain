@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Box } from '@mui/material';
+import {Container, Box } from '@mui/material';
 import { useAuth0 } from '@auth0/auth0-react';
 
 // Components
-import { LoadingSpinner } from './components/Common/LoadingSpinner'; // <-- Vérifie le chemin
+import { LoadingSpinner } from './components/Common/LoadingSpinner'; 
 import { Sidebar } from './components/Layout/Sidebar';
 import { Navbar } from './components/Layout/Navbar';
 
@@ -13,7 +13,7 @@ import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage';
 import RankingPage from './pages/RankingPage';
 import ProfilePage from './pages/ProfilePage';
-import ProtectedRoute from './components/Common/ProtectedRoute'; // <-- Vérifie le chemin
+import ProtectedRoute from './components/Common/ProtectedRoute'; 
 
 // Hooks
 import useAuthUser from './hooks/useAuthUser.js';
@@ -73,44 +73,46 @@ function App() {
               minHeight: 'calc(100vh - 64px)', // 64px = hauteur Navbar
             }}
           >
-            <Routes>
-              {/* Routes publiques */}
-              <Route path="/" element={<HomePage />} />
-              {/* La page de login ne devrait être accessible que si non authentifié */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/ranking" element={<RankingPage />} />
+            <Container maxWidth="lg">
+              <Routes>
+                {/* Routes publiques */}
+                <Route path="/" element={<HomePage />} />
+                {/* La page de login ne devrait être accessible que si non authentifié */}
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/ranking" element={<RankingPage />} />
 
-              {/* Routes protégées - Nécessitent une authentification */}
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute> {/* ProtectedRoute utilise useAuth0().isAuthenticated */}
-                    <ProfilePage />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Routes protégées - Nécessitent une authentification */}
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute> {/* ProtectedRoute utilise useAuth0().isAuthenticated */}
+                      <ProfilePage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Route 404 */}
-              <Route
-                path="*"
-                element={
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      minHeight: '50vh',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div>
-                      <h1>404 - Page non trouvée</h1>
-                      <p>La page que vous cherchez n'existe pas.</p>
-                    </div>
-                  </Box>
-                }
-              />
-            </Routes>
+                {/* Route 404 */}
+                <Route
+                  path="*"
+                  element={
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: '50vh',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <div>
+                        <h1>404 - Page non trouvée</h1>
+                        <p>La page que vous cherchez n'existe pas.</p>
+                      </div>
+                    </Box>
+                  }
+                />
+              </Routes>
+            </Container>
           </Box>
         </Box>
       </Box>

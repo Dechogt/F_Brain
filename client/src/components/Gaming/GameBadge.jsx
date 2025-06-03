@@ -1,8 +1,8 @@
 import { Box, Typography, LinearProgress, Avatar } from '@mui/material'
 import { motion } from 'framer-motion'
 
-const GameBadge = ({ game, level, hours }) => {
-  const getGameColor = (gameName) => {
+const GameBadge = ({ game, level, hours }) => { // 'game' est la chaîne ici
+  const getGameColor = (gameName) => { // gameName est la chaîne passée
     const colors = {
       'Valorant': '#FF4655',
       'League of Legends': '#0AC8B9',
@@ -10,10 +10,11 @@ const GameBadge = ({ game, level, hours }) => {
       'Fortnite': '#C3B1E1',
       'Dota 2': '#E54D42'
     }
-    console.log(gameName)
-    return colors[game] || '#9C27B0'
+    console.log(gameName) // gameName est la chaîne
+    // Utilise gameName pour chercher la couleur
+    return colors[gameName] || '#9C27B0'
   }
-  
+
 
   return (
     <Box
@@ -25,41 +26,44 @@ const GameBadge = ({ game, level, hours }) => {
         borderRadius: 2,
         width: 180,
         textAlign: 'center',
+        // Utilise game pour obtenir la couleur
         borderLeft: `4px solid ${getGameColor(game)}`
       }}
     >
       <Avatar
-        src={`/games/${game.toLowerCase().replace(/\s+/g, '-')}.png`}
-        sx={{ 
-          width: 60, 
+        // Utilise directement la prop 'game' (la chaîne)
+        src={`/games/${game.toLowerCase().replace(/\s+/g, '-')}.png`} // <-- CORRECTION ICI
+        sx={{
+          width: 60,
           height: 60,
           mx: 'auto',
           mb: 1,
           bgcolor: 'background.paper'
         }}
       />
-      
+
       <Typography variant="subtitle1" gutterBottom>
-        {game}
+        {game} {/* Affiche le nom du jeu (la chaîne) */}
       </Typography>
-      
+
       <Box sx={{ mb: 1 }}>
         <Typography variant="caption" display="block">
           Niveau {level}
         </Typography>
-        <LinearProgress 
-          variant="determinate" 
-          value={(level % 100)} 
-          sx={{ 
+        <LinearProgress
+          variant="determinate"
+          value={(level % 100)}
+          sx={{
             height: 6,
             borderRadius: 3,
             '& .MuiLinearProgress-bar': {
+              // Utilise game pour obtenir la couleur
               bgcolor: getGameColor(game)
             }
-          }} 
+          }}
         />
       </Box>
-      
+
       <Typography variant="caption" color="text.secondary">
         {hours} heures
       </Typography>

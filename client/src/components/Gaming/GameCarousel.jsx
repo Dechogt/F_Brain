@@ -56,23 +56,37 @@ const GameCarousel = () => {
           }}
         >
           {games.map((game) => (
-            <Box 
-              key={game.name} 
-              sx={{ 
-                flexShrink: 0,
-                scrollSnapAlign: 'start'
+            <Box
+              ref={ref}
+              component={motion.div}
+              style={{ x }}
+              sx={{
+                display: 'flex',
+                gap: 3,
+                px: 2, // Ajoute un padding horizontal
+                py: 4,
+                overflowX: 'auto', // Permet le défilement
+                scrollSnapType: 'x mandatory',
+                // Optionnel: Masquer la scrollbar si tu préfères
+                // '&::-webkit-scrollbar': { display: 'none' },
+                // '-ms-overflow-style': 'none',
+                // 'scrollbar-width': 'none',
               }}
             >
-              <GameBadge {...game} />
+              <GameBadge
+                game={game.name}
+                level={game.level}
+                hours={game.hours}
+              />
             </Box>
           ))}
         </Box>
         
         <IconButton
-          sx={{ 
-            position: 'absolute', 
-            right: 0, 
-            top: '50%', 
+          sx={{
+            position: 'absolute',
+            left: 0, // Positionne à gauche
+            top: '50%',
             transform: 'translateY(-50%)',
             zIndex: 2,
             bgcolor: 'background.paper',

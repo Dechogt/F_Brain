@@ -25,5 +25,9 @@ urlpatterns = [
     path('api/', include('gameur.urls')),
 ]
 
-# if settings.DEBUG:
-#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# En développement, pour servir les fichiers médias (avatars)
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
