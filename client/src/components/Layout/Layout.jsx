@@ -7,17 +7,32 @@ import { useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import LoadingSpinner from '../Common/LoadingSpinner'
 
+// Définis les largeurs de la Sidebar ici pour les utiliser dans le Layout
+const DRAWER_WIDTH = 280
+const DRAWER_WIDTH_COLLAPSED = 70
+
 // Style personnalisé pour le contenu principal
-const MainContent = styled(motion.main)(({ theme }) => ({
+const MainContent = styled(motion.main)(({ theme, drawerWidth }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
-  paddingTop: theme.spacing(10),
-  width: '100%',
-  maxWidth: 1800,
-  margin: '0 auto',
-  [theme.breakpoints.down('sm')]: {
+  paddingTop: theme.mixins.toolbar.minHeight,
+  width: '100%', // Par défaut, prend 100% de la largeur disponible
+  // Retire le maxWidth et margin: '0 auto' des styles de base
+
+  [theme.breakpoints.up('md')]: {
+     marginLeft: `${drawerWidth}px`, 
+     width: `calc(100% - ${drawerWidth}px)`, 
+     // Applique le maxWidth et le centrage APRES avoir pris en compte la Sidebar
+     maxWidth: 1800, 
+     margin: '0 auto', 
+  },
+  [theme.breakpoints.down('md')]: {
     padding: theme.spacing(2),
-    paddingTop: theme.spacing(8)
+    paddingTop: theme.mixins.toolbar.minHeight,
+    marginLeft: 0, 
+    width: '100%', 
+    maxWidth: '100%', 
+    margin: '0 auto', 
   }
 }))
 
@@ -36,28 +51,35 @@ const PageTransition = ({ children }) => (
 const Layout = ({ children }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+
+  // --- Déclare l'état mobileOpen ici ---
+  const [mobileOpen, setMobileOpen] = useState(false)
+  // ------------------------------------
+
+  // --- Supprime ou commente les états inutilisés si tu ne les utilises pas ---
+  // const [sidebarOpen, setSidebarOpen] = useState(false) // Probablement inutile si tu utilises mobileOpen
   const [isScrolled, setIsScrolled] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [progress, setProgress] = useState(0)
+  // const [loading, setLoading] = useState(true) // Inutilisé après désactivation du faux chargement
+  // const [progress, setProgress] = useState(0) // Inutilisé après désactivation du faux chargement
+  // -------------------------------------------------------------------------
+
   const location = useLocation()
-  const { isLoading } = useAuth0()
+  const { isLoading: auth0Loading } = useAuth0()
 
-  // Effet de chargement initial
+  const currentDrawerWidth = collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
+
+  // Effet de chargement initial (basé sur Auth0)
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((oldProgress) => {
-        if (oldProgress === 100) {
-          clearInterval(timer)
-          setLoading(false)
-          return 100
-        }
-        return Math.min(oldProgress + 10, 100)
-      })
-    }, 200)
-
-    return () => clearInterval(timer)
-  }, [])
+    // Si tu veux lier le chargement à Auth0 et useAuthUser:
+    // const { loading: userLoading } = useAuthUser(); // Importe useAuthUser
+    // if (!auth0Loading && !userLoading) {
+    //   setLoading(false); // Utilise l'état loading si tu le gardes
+    // } else {
+    //   setLoading(true); // Utilise l'état loading si tu le gardes
+    // }
+    // Pour l'instant, on se base juste sur auth0Loading pour l'affichage du spinner pleine page
+  }, [auth0Loading]); // Ajoute les dépendances de chargement réelles
 
   // Gestion du scroll
   useEffect(() => {
@@ -70,19 +92,20 @@ const Layout = ({ children }) => {
 
   // Fermeture automatique du sidebar sur mobile
   useEffect(() => {
-    if (isMobile && sidebarOpen) {
-      setSidebarOpen(false)
+    // Utilise mobileOpen et setMobileOpen
+    if (isMobile && mobileOpen) {
+      setMobileOpen(false)
     }
-  }, [location, isMobile, sidebarOpen])
+  }, [location, isMobile, mobileOpen]) // Dépendances correctes
 
-  // Fond animé gaming
+  // Fond animé gaming (peut rester tel quel)
   const getBackground = () => {
     return `
-      radial-gradient(circle at 10% 20%, 
-        ${theme.palette.primary.dark}15 0%, 
+      radial-gradient(circle at 10% 20%,
+        ${theme.palette.primary.dark}15 0%,
         transparent 25%),
-      radial-gradient(circle at 90% 80%, 
-        ${theme.palette.secondary.dark}15 0%, 
+      radial-gradient(circle at 90% 80%,
+        ${theme.palette.secondary.dark}15 0%,
         transparent 25%),
       linear-gradient(
         135deg,
@@ -96,9 +119,10 @@ const Layout = ({ children }) => {
     `
   }
 
-  if (isLoading || loading) {
-    return <LoadingSpinner progress={progress} />
-  }
+  // Affiche le spinner pleine page si Auth0 charge
+   if (auth0Loading) {
+     return <LoadingSpinner isOverlay={true} />;
+   }
 
   return (
     <Box
@@ -122,37 +146,33 @@ const Layout = ({ children }) => {
         }
       }}
     >
-      {/* Barre de progression lors du chargement des routes */}
-      <LinearProgress 
-        variant="determinate" 
-        value={progress} 
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 9999,
-          height: 3,
-          '& .MuiLinearProgress-bar': {
-            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
-          }
-        }}
+      {/* Barre de progression (si tu la gardes et la lies à un chargement réel) */}
+      {/* {loading && progress < 100 && ( ... )} */}
+
+
+      {/* Navbar */}
+      <Navbar
+        isScrolled={isScrolled}
+        onMobileMenuToggle={() => setMobileOpen(!mobileOpen)} // Passe la fonction pour ouvrir/fermer le mobile drawer
+        drawerWidth={currentDrawerWidth} // Passe la largeur actuelle de la Sidebar
       />
 
-      <Navbar 
-        isScrolled={isScrolled} 
-        onMenuClick={() => setSidebarOpen(!sidebarOpen)} 
-      />
-      
-      <Sidebar 
-        open={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
+      {/* Sidebar (Desktop permanent et Mobile temporary) */}
+      <Sidebar
+        drawerWidth={DRAWER_WIDTH}
+        drawerWidthCollapsed={DRAWER_WIDTH_COLLAPSED}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        mobileOpen={mobileOpen} // Passe l'état du mobile drawer
+        setMobileOpen={setMobileOpen} // Passe la fonction pour changer l'état du mobile drawer
       />
 
+      {/* Contenu principal */}
       <MainContent
         key={location.pathname}
         initial="hidden"
         animate="visible"
+        drawerWidth={currentDrawerWidth} // Passe la largeur actuelle de la Sidebar au MainContent
       >
         <AnimatePresence mode="wait">
           <PageTransition>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
   Drawer,
@@ -16,6 +16,7 @@ import {
   Chip,
   useTheme,
   useMediaQuery,
+  Toolbar,
 } from '@mui/material'
 import {
   Home,
@@ -32,20 +33,27 @@ import {
 } from '@mui/icons-material'
 import { useAuth } from '../../hooks/useAuth.js'
 
-const DRAWER_WIDTH = 280
-const DRAWER_WIDTH_COLLAPSED = 70
+// Retire les constantes si tu les passes en props depuis le Layout
+// const DRAWER_WIDTH = 280
+// const DRAWER_WIDTH_COLLAPSED = 70
 
-export const Sidebar = () => {
+// Reçoit les props du Layout
+export const Sidebar = ({
+  drawerWidth, // <-- Utilise cette prop
+  drawerWidthCollapsed, // <-- Utilise cette prop
+  collapsed,
+  setCollapsed,
+  mobileOpen,
+  setMobileOpen,
+}) => {
   const theme = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const { user, isAuthenticated, logout } = useAuth()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  
-  const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
 
-  // Menu items avec icônes gaming
+  // ... (menuItems, userMenuItems, handleNavigation, handleLogout, isActive) ...
+
   const menuItems = [
     {
       title: 'Accueil',
@@ -64,7 +72,7 @@ export const Sidebar = () => {
     {
       title: 'Classement',
       icon: <Leaderboard />,
-      path: '/leaderboard',
+      path: '/ranking',
       color: '#FFB300',
       public: true,
     },
@@ -122,6 +130,7 @@ export const Sidebar = () => {
 
   const isActive = (path) => location.pathname === path;
 
+
   const sidebarContent = (
     <Box
       sx={{
@@ -132,68 +141,63 @@ export const Sidebar = () => {
         borderRight: `1px solid rgba(0, 230, 118, 0.1)`,
       }}
     >
-      {/* Header avec logo */}
-      <Box
-        sx={{
-          p: collapsed ? 1 : 3,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          borderBottom: `1px solid rgba(0, 230, 118, 0.1)`,
-          minHeight: 80,
-        }}
-      >
-        <Box
-          sx={{
-            width: 40,
-            height: 40,
-            borderRadius: '12px',
-            background: 'linear-gradient(45deg, #00E676, #00B8D4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <SportsEsports sx={{ color: '#000', fontSize: 24 }} />
-        </Box>
-        
-        {!collapsed && (
-          <Box>
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                background: 'linear-gradient(45deg, #00E676, #00B8D4)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Gaming Followers
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              v1.0.0
-            </Typography>
-          </Box>
-        )}
-        
-        {/* Toggle button */}
-        {!isMobile && (
-          <IconButton
-            onClick={() => setCollapsed(!collapsed)}
-            sx={{
-              ml: 'auto',
-              color: 'text.secondary',
-              '&:hover': {
-                color: 'primary.main',
-                backgroundColor: 'rgba(0, 230, 118, 0.1)',
-              },
-            }}
-          >
-            {collapsed ? <ChevronRight /> : <ChevronLeft />}
-          </IconButton>
-        )}
-      </Box>
+      {/* Espace pour la Toolbar de la Navbar */}
+      <Toolbar sx={{ minHeight: 80 }}>
+         {!isMobile && (
+           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+             <Box
+               sx={{
+                 width: 40,
+                 height: 40,
+                 borderRadius: '12px',
+                 background: 'linear-gradient(45deg, #00E676, #00B8D4)',
+                 display: 'flex',
+                 alignItems: 'center',
+                 justifyContent: 'center',
+                 flexShrink: 0,
+               }}
+             >
+               <SportsEsports sx={{ color: '#000', fontSize: 24 }} />
+             </Box>
+
+             {!collapsed && (
+               <Box>
+                 <Typography
+                   variant="h6"
+                   sx={{
+                     fontWeight: 700,
+                     background: 'linear-gradient(45deg, #00E676, #00B8D4)',
+                     WebkitBackgroundClip: 'text',
+                     WebkitTextFillColor: 'transparent',
+                   }}
+                 >
+                   Gaming Followers
+                 </Typography>
+                 <Typography variant="caption" color="text.secondary">
+                   v1.0.0
+                 </Typography>
+               </Box>
+             )}
+           </Box>
+         )}
+         {!isMobile && (
+           <IconButton
+             onClick={() => setCollapsed(!collapsed)}
+             sx={{
+               ml: 'auto',
+               color: 'text.secondary',
+               '&:hover': {
+                 color: 'primary.main',
+                 backgroundColor: 'rgba(0, 230, 118, 0.1)',
+               },
+             }}
+           >
+             {collapsed ? <ChevronRight /> : <ChevronLeft />}
+           </IconButton>
+         )}
+      </Toolbar>
+      <Divider sx={{ borderColor: 'rgba(0, 230, 118, 0.1)' }} />
+
 
       {/* User info si connecté */}
       {isAuthenticated && user && (
@@ -218,7 +222,7 @@ export const Sidebar = () => {
           >
             {user.displayName?.[0]?.toUpperCase()}
           </Avatar>
-          
+
           {!collapsed && (
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
@@ -265,11 +269,10 @@ export const Sidebar = () => {
       {/* Menu principal */}
       <List sx={{ flex: 1, px: 1, py: 2 }}>
         {menuItems.map((item) => {
-          // Vérifier si l'item doit être affiché
           if (item.requireAuth && !isAuthenticated) return null;
-          
+
           const active = isActive(item.path);
-          
+
           return (
             <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
               <Tooltip
@@ -302,7 +305,7 @@ export const Sidebar = () => {
                   >
                     {item.icon}
                   </ListItemIcon>
-                  
+
                   {!collapsed && (
                     <ListItemText
                       primary={item.title}
@@ -315,7 +318,7 @@ export const Sidebar = () => {
                       }}
                     />
                   )}
-                  
+
                   {active && !collapsed && (
                     <Box
                       sx={{
@@ -341,7 +344,7 @@ export const Sidebar = () => {
           <List sx={{ px: 1, py: 1 }}>
             {userMenuItems.map((item) => {
               const active = isActive(item.path);
-              
+
               return (
                 <ListItem key={item.path} disablePadding>
                   <Tooltip
@@ -370,7 +373,7 @@ export const Sidebar = () => {
                       >
                         {item.icon}
                       </ListItemIcon>
-                      
+
                       {!collapsed && (
                         <ListItemText
                           primary={item.title}
@@ -387,7 +390,7 @@ export const Sidebar = () => {
                 </ListItem>
               );
             })}
-            
+
             {/* Bouton de déconnexion */}
             <ListItem disablePadding>
               <Tooltip
@@ -415,7 +418,7 @@ export const Sidebar = () => {
                   >
                     <Logout />
                   </ListItemIcon>
-                  
+
                   {!collapsed && (
                     <ListItemText
                       primary="Déconnexion"
@@ -442,10 +445,10 @@ export const Sidebar = () => {
         <Drawer
           variant="permanent"
           sx={{
-            width: collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH,
+            width: collapsed ? drawerWidthCollapsed : drawerWidth, // <-- Utilise les props ici
             flexShrink: 0,
             '& .MuiDrawer-paper': {
-              width: collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH,
+              width: collapsed ? drawerWidthCollapsed : drawerWidth, // <-- Utilise les props ici
               boxSizing: 'border-box',
               transition: 'width 0.3s ease',
               overflowX: 'hidden',
@@ -467,7 +470,7 @@ export const Sidebar = () => {
           }}
           sx={{
             '& .MuiDrawer-paper': {
-              width: DRAWER_WIDTH,
+              width: drawerWidth, // <-- Utilise la prop ici (largeur dépliée pour mobile)
               boxSizing: 'border-box',
             },
           }}

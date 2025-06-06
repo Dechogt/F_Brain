@@ -33,12 +33,13 @@ import LoginButton from '../Auth/LoginButton'
 import LogoutButton from '../Auth/LogoutButton'
 import Profile from '../Auth/Profile'
 
-export const Navbar = ({ onMobileMenuToggle }) => {
+// Reçoit la largeur de la Sidebar en prop
+export const Navbar = ({ onMobileMenuToggle, drawerWidth }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { user, isAuthenticated, logout } = useAuth()
   const { isDarkMode, toggleDarkMode } = useCustomTheme()
-  
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationAnchor, setNotificationAnchor] = useState(null)
   const [searchValue, setSearchValue] = useState('')
@@ -93,9 +94,13 @@ export const Navbar = ({ onMobileMenuToggle }) => {
 
   return (
     <AppBar
-      position="fixed"
+      position="fixed" // Reste fixée en haut
       sx={{
-        zIndex: theme.zIndex.drawer + 1,
+        // Sur desktop (>= md), décale la Navbar de la largeur de la Sidebar
+        // et réduit sa largeur en conséquence
+        width: { md: `calc(100% - ${drawerWidth}px)` }, // Largeur = 100% - largeur Sidebar
+        ml: { md: `${drawerWidth}px` }, // Marge à gauche égale à la largeur de la Sidebar
+        zIndex: theme.zIndex.drawer + 1, // Assure qu'elle est au-dessus de la Sidebar
         background: 'rgba(26, 31, 58, 0.95)',
         backdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(0, 230, 118, 0.1)',
@@ -115,23 +120,26 @@ export const Navbar = ({ onMobileMenuToggle }) => {
           </IconButton>
         )}
 
-        {/* Logo et titre pour mobile */}
-        {isMobile && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SportsEsports sx={{ color: 'primary.main' }} />
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: 700,
-                background: 'linear-gradient(45deg, #00E676, #00B8D4)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Gaming Followers
-            </Typography>
-          </Box>
-        )}
+        {/* Logo et titre pour mobile (ou toujours si tu veux) */}
+        {/* Sur desktop, le logo/titre est souvent dans la Sidebar */}
+        {/* {isMobile && ( ... )} */}
+         {!isMobile && ( // Affiche le logo/titre sur desktop si tu le veux dans la Navbar
+           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+             <SportsEsports sx={{ color: 'primary.main' }} />
+             <Typography
+               variant="h6"
+               sx={{
+                 fontWeight: 700,
+                 background: 'linear-gradient(45deg, #00E676, #00B8D4)',
+                 WebkitBackgroundClip: 'text',
+                 WebkitTextFillColor: 'transparent',
+               }}
+             >
+               Gaming Followers
+             </Typography>
+           </Box>
+         )}
+
 
         {/* Barre de recherche */}
         <Box sx={{ flexGrow: 1, maxWidth: 600, mx: 2 }}>
@@ -224,139 +232,145 @@ export const Navbar = ({ onMobileMenuToggle }) => {
               </Avatar>
             </IconButton>
           ) : (
-            <Button
-              variant="contained"
-              startIcon={<Person />}
-              onClick={() => window.location.href = '/login'}
-              sx={{
-                borderRadius: 3,
-                textTransform: 'none',
-                fontWeight: 600,
-              }}
-            >
-              Connexion
-            </Button>
+            // Utilise le composant LoginButton que tu as déjà
+            <LoginButton />
+            // Ou si tu préfères le bouton direct:
+            // <Button
+            //   variant="contained"
+            //   startIcon={<Person />}
+            //   onClick={() => window.location.href = '/login'} // Redirection simple
+            //   sx={{
+            //     borderRadius: 3,
+            //     textTransform: 'none',
+            //     fontWeight: 600,
+            //   }}
+            // >
+            //   Connexion
+            // </Button>
           )}
         </Box>
 
         {/* Menu des notifications */}
-        <Menu
-          anchorEl={notificationAnchor}
-          open={Boolean(notificationAnchor)}
-          onClose={handleNotificationClose}
-          PaperProps={{
-            sx: {
-              width: 360,
-              maxHeight: 400,
-              backgroundColor: 'background.paper',
-              border: '1px solid rgba(0, 230, 118, 0.1)',
-            },
-          }}
-        >
-          <Box sx={{ p: 2, borderBottom: '1px solid rgba(0, 230, 118, 0.1)' }}>
-            <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Notifications color="primary" />
-              Notifications
-              {unreadCount > 0 && (
-                <Badge badgeContent={unreadCount} color="error" sx={{ ml: 1 }} />
-              )}
-            </Typography>
-          </Box>
-          
-          {notifications.map((notification) => (
-            <MenuItem
-              key={notification.id}
-              sx={{
-                flexDirection: 'column',
-                alignItems: 'flex-start',
-                backgroundColor: notification.unread ? 'rgba(0, 230, 118, 0.05)' : 'transparent',
-                borderLeft: notification.unread ? '3px solid #00E676' : '3px solid transparent',
-                '&:hover': {
-                  backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                },
-              }}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                  {notification.title}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {notification.time}
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                {notification.message}
-              </Typography>
-            </MenuItem>
-          ))}
-          
-          <Divider />
-          <MenuItem sx={{ justifyContent: 'center', color: 'primary.main' }}>
-            Voir toutes les notifications
-          </MenuItem>
-        </Menu>
+        {/* ... (ton code de menu notifications) ... */}
+         <Menu
+           anchorEl={notificationAnchor}
+           open={Boolean(notificationAnchor)}
+           onClose={handleNotificationClose}
+           PaperProps={{
+             sx: {
+               width: 360,
+               maxHeight: 400,
+               backgroundColor: 'background.paper',
+               border: '1px solid rgba(0, 230, 118, 0.1)',
+             },
+           }}
+         >
+           <Box sx={{ p: 2, borderBottom: '1px solid rgba(0, 230, 118, 0.1)' }}>
+             <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+               <Notifications color="primary" />
+               Notifications
+               {unreadCount > 0 && (
+                 <Badge badgeContent={unreadCount} color="error" sx={{ ml: 1 }} />
+               )}
+             </Typography>
+           </Box>
+
+           {notifications.map((notification) => (
+             <MenuItem
+               key={notification.id}
+               sx={{
+                 flexDirection: 'column',
+                 alignItems: 'flex-start',
+                 backgroundColor: notification.unread ? 'rgba(0, 230, 118, 0.05)' : 'transparent',
+                 borderLeft: notification.unread ? '3px solid #00E676' : '3px solid transparent',
+                 '&:hover': {
+                   backgroundColor: 'rgba(0, 230, 118, 0.1)',
+                 },
+               }}
+             >
+               <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                   {notification.title}
+                 </Typography>
+                 <Typography variant="caption" color="text.secondary">
+                   {notification.time}
+                 </Typography>
+               </Box>
+               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                 {notification.message}
+               </Typography>
+             </MenuItem>
+           ))}
+
+           <Divider />
+           <MenuItem sx={{ justifyContent: 'center', color: 'primary.main' }}>
+             Voir toutes les notifications
+           </MenuItem>
+         </Menu>
+
 
         {/* Menu du profil utilisateur */}
-        <Menu
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleProfileMenuClose}
-          PaperProps={{
-            sx: {
-              width: 280,
-              backgroundColor: 'background.paper',
-              border: '1px solid rgba(0, 230, 118, 0.1)',
-            },
-          }}
-        >
-          {/* Info utilisateur */}
-          <Box sx={{ p: 2, borderBottom: '1px solid rgba(0, 230, 118, 0.1)' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Avatar
-                src={user?.avatar}
-                sx={{
-                  width: 50,
-                  height: 50,
-                  bgcolor: 'primary.main',
-                }}
-              >
-                {user?.displayName?.[0]?.toUpperCase()}
-              </Avatar>
-              <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                  {user?.displayName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {user?.email}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                  <EmojiEvents sx={{ fontSize: 16, color: 'warning.main' }} />
-                  <Typography variant="caption" color="warning.main">
-                    Niveau 15 • Master
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          </Box>
+        {/* ... (ton code de menu profil) ... */}
+         <Menu
+           anchorEl={anchorEl}
+           open={Boolean(anchorEl)}
+           onClose={handleProfileMenuClose}
+           PaperProps={{
+             sx: {
+               width: 280,
+               backgroundColor: 'background.paper',
+               border: '1px solid rgba(0, 230, 118, 0.1)',
+             },
+           }}
+         >
+           {/* Info utilisateur */}
+           <Box sx={{ p: 2, borderBottom: '1px solid rgba(0, 230, 118, 0.1)' }}>
+             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+               <Avatar
+                 src={user?.avatar}
+                 sx={{
+                   width: 50,
+                   height: 50,
+                   bgcolor: 'primary.main',
+                 }}
+               >
+                 {user?.displayName?.[0]?.toUpperCase()}
+               </Avatar>
+               <Box>
+                 <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                   {user?.displayName}
+                 </Typography>
+                 <Typography variant="body2" color="text.secondary">
+                   {user?.email}
+                 </Typography>
+                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                   <EmojiEvents sx={{ fontSize: 16, color: 'warning.main' }} />
+                   <Typography variant="caption" color="warning.main">
+                     Niveau 15 • Master
+                   </Typography>
+                 </Box>
+               </Box>
+             </Box>
+           </Box>
 
-          {/* Menu items */}
-          <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/profile' }}>
-            <Person sx={{ mr: 2, color: 'text.secondary' }} />
-            Mon Profil
-          </MenuItem>
-          
-          <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/settings' }}>
-            <Settings sx={{ mr: 2, color: 'text.secondary' }} />
-            Paramètres
-          </MenuItem>
-          
-          <Divider />
-          
-          <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
-            <Logout sx={{ mr: 2 }} />
-            Déconnexion
-          </MenuItem>
-        </Menu>
+           {/* Menu items */}
+           <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/profile' }}>
+             <Person sx={{ mr: 2, color: 'text.secondary' }} />
+             Mon Profil
+           </MenuItem>
+
+           <MenuItem onClick={() => { handleProfileMenuClose(); window.location.href = '/settings' }}>
+             <Settings sx={{ mr: 2, color: 'text.secondary' }} />
+             Paramètres
+           </MenuItem>
+
+           <Divider />
+
+           <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+             <Logout sx={{ mr: 2 }} />
+             Déconnexion
+           </MenuItem>
+         </Menu>
       </Toolbar>
     </AppBar>
   )
