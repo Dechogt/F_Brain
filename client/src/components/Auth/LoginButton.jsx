@@ -14,7 +14,7 @@ const LoginButton = () => {
       whileTap={{ scale: 0.95 }}
       onClick={() => loginWithRedirect()}
       sx={{
-        background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.accent.purple} 100%)`,
+        background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.dark} 100%)`,
         color: 'white',
         fontWeight: 'bold',
         px: 4,

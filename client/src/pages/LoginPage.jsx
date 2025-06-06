@@ -8,7 +8,7 @@ const LoginPage = () => {
 
   return (
     <Box sx={{ 
-      minHeight: '100vh',
+      minHeight: '90vh',
       display: 'flex',
       alignItems: 'center',
       position: 'relative',
@@ -16,18 +16,18 @@ const LoginPage = () => {
     }}>
       <GameBackground />
       
-      <Container maxWidth="sm">
+      <Container maxWidth="md">
         <Box
           component={motion.div}
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           sx={{
-            bgcolor: 'rgba(26, 26, 26, 0.9)',
+            bgcolor: 'rgba(15, 15, 15, 0.24)',
             p: 6,
             borderRadius: 4,
-            boxShadow: '0 0 30px rgba(255, 107, 53, 0.2)',
-            border: '1px solid rgba(255, 107, 53, 0.3)',
+            boxShadow: '0 0 30px rgba(58, 4, 236, 0.2)',
+            border: '1px solid rgba(37, 9, 195, 0.15)',
             textAlign: 'center',
             backdropFilter: 'blur(10px)'
           }}
@@ -45,7 +45,7 @@ const LoginPage = () => {
               fontWeight: 'bold'
             }}
           >
-            Bienvenue sur GameHub
+            Bienvenue sur Gaming Followers
           </Typography>
           
           <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
