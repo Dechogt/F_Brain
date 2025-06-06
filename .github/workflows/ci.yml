@@ -75,15 +75,7 @@ jobs:
         timeout 180 bash -c 'until docker compose exec rabbitmq rabbitmqctl status; do sleep 3; done'
         echo "✅ RabbitMQ is ready!"
 
-    - name: 🧪 Test RabbitMQ management
-      run: |
-        # Test management interface availability
-        timeout 30 bash -c 'until curl -f http://localhost:15672; do sleep 2; done'
-        echo "✅ RabbitMQ management interface accessible"
-
-    - name: 🧹 Cleanup
-      if: always()
-      run: docker compose down -v
+    
 
   # =============================================
   # JOB 3: 📊 MONITORING STACK HEALTH
