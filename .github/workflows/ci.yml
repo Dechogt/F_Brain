@@ -126,7 +126,7 @@ jobs:
     - name: 🏗️ Build for staging with Yarn
       working-directory: ./client 
       run: |
-        yarn install --frozen-lockfile
+        yarn install 
         yarn build
       env:
         VITE_AUTH0_DOMAIN: ${{ secrets.STAGING_AUTH0_DOMAIN }}
@@ -169,7 +169,7 @@ jobs:
     - name: 🏗️ Build for production with Yarn
       working-directory: ./client
       run: |
-        yarn install --frozen-lockfile
+        yarn install 
         yarn build
       env:
         VITE_AUTH0_DOMAIN: ${{ secrets.PROD_AUTH0_DOMAIN }}
