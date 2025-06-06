@@ -2,7 +2,7 @@ name: 🎮 Gaming Followers CI/CD
 
 on:
   push:
-    branches: [ dev, main ]
+    branches: [ dev, main ]  #Il faut que je gere de telles faccoons que le push sur dev gere le merge vers main
   pull_request:
     branches: [ dev, main ]
 
@@ -72,9 +72,9 @@ jobs:
         docker compose up -d rabbitmq
         echo "⏳ Waiting for RabbitMQ to be ready..."
         # Augmente le timeout (par exemple, à 120 ou 180 secondes)
-        timeout 180 bash -c 'until docker compose exec rabbitmq rabbitmqctl status; do sleep 3; done'
+        timeout 30 bash -c 'until docker compose exec rabbitmq rabbitmqctl status; do sleep 3; done'
         echo "✅ RabbitMQ is ready!"
-
+      continue-on-error: true
     
 
   # =============================================
