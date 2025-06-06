@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+# import environ
 import os
 from pathlib import Path
 
@@ -23,6 +24,14 @@ CELERY_RESULT_BACKEND = "django-db"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
+
+
+# env = environ.Env(
+#     # Définis les types par défaut si les variables ne sont pas trouvées
+#     DATABASE_URL=(str, 'postgres://test_user:test_password@db:5432/gaming_followers_test'),
+# )
+
+# environ.Env.read_env(os.path.join(BASE_DIR, '..', '.env'))  # Charge les variables d'environnement depuis le fichier .env hors de ce projet
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-u2y)90@eilwlgqzkiqf(#7i4dh+@q=^%22^-0kugww(tjiw@0&'
