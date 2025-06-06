@@ -167,16 +167,6 @@ jobs:
       run: |
         docker compose run --rm frontend npm run lint || echo "⚠️ Linting issues found"
 
-    - name: 📦 Export frontend build artifacts
-      run: |
-        # Extract built files for verification
-        docker compose run --rm -v $(pwd)/dist:/export frontend sh -c "cp -r /app/dist/* /export/"
-        ls -la dist/ || echo "📁 Build directory verification"
-
-    - name: 🧹 Cleanup
-      if: always()
-      run: docker compose down -v
-
   # =============================================
   # JOB 5: 🐍 BACKEND (Django) BUILD & TEST
   # =============================================
