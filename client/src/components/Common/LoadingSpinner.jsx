@@ -27,23 +27,39 @@ const rotate = keyframes`
   }
 `;
 
-export const LoadingSpinner = ({ 
-  size = 60, 
-  message = "Chargement...", 
-  variant = "gaming" 
+export const LoadingSpinner = ({
+  size = 60,
+  message = "Chargement...",
+  variant = "gaming",
+  // Ajoute une prop pour contrôler si c'est un overlay pleine page
+  isOverlay = true,
 }) => {
+  // Styles de base pour le conteneur du spinner
+  const spinnerContainerStyles = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+    // Styles pour l'overlay pleine page
+    ...(isOverlay && {
+      position: 'fixed', // Positionnement fixe par rapport au viewport
+      top: 0,
+      left: 0,
+      width: '100vw', // Prend toute la largeur du viewport
+      height: '100vh', // Prend toute la hauteur du viewport
+      backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fond semi-transparent pour masquer le contenu derrière
+      zIndex: 9999, // Assure qu'il est au-dessus des autres éléments
+    }),
+    // Styles si ce n'est PAS un overlay (comportement original)
+    ...(!isOverlay && {
+      minHeight: '100vh', // Prend au moins la hauteur du viewport
+      backgroundColor: 'background.default', // Utilise la couleur de fond du thème
+    }),
+  };
+
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        backgroundColor: 'background.default',
-        gap: 3,
-      }}
-    >
+    <Box sx={spinnerContainerStyles}> {/* Applique les styles conditionnels */}
       {variant === 'gaming' ? (
         <>
           {/* Cercle extérieur animé */}
@@ -66,7 +82,7 @@ export const LoadingSpinner = ({
                 position: 'absolute',
               }}
             />
-            
+
             {/* Cercle principal */}
             <CircularProgress
               size={size}
@@ -79,7 +95,7 @@ export const LoadingSpinner = ({
                 },
               }}
             />
-            
+
             {/* Point central */}
             <Box
               sx={{
@@ -92,7 +108,7 @@ export const LoadingSpinner = ({
               }}
             />
           </Box>
-          
+
           {/* Texte de chargement */}
           <Typography
             variant="h6"
@@ -105,7 +121,7 @@ export const LoadingSpinner = ({
           >
             {message}
           </Typography>
-          
+
           {/* Points animés */}
           <Box sx={{ display: 'flex', gap: 1 }}>
             {[0, 1, 2].map((index) => (
