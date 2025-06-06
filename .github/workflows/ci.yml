@@ -7,7 +7,7 @@ on:
     branches: [ main, dev ]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22.11.O'
   PYTHON_VERSION: '3.11'
 
 jobs:
