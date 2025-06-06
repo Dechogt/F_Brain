@@ -27,6 +27,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'yarn'
+        cache-dependency-path: './client/yarn.lock'
 
     - name: 🔧 Install dependencies with Yarn
       working-directory: ./client
@@ -120,6 +121,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'yarn'
+        cache-dependency-path: './client/yarn.lock'
 
     - name: 🏗️ Build for staging with Yarn
       working-directory: ./client 
@@ -162,6 +164,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'yarn'
+        cache-dependency-path: './client/yarn.lock'
 
     - name: 🏗️ Build for production with Yarn
       working-directory: ./client
