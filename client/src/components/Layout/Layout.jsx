@@ -80,8 +80,6 @@ const Layout = ({ children }) => {
   // Affiche le spinner si Auth0 charge OU si useAuthUser charge
   const showLoadingSpinner = auth0Loading || userLoading;
 
-
-  // Gestion du scroll (peut rester)
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)

@@ -3,8 +3,8 @@ import React, { createContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export const ThemeContextProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(true); // Par défaut dark mode pour gaming
-  const [accentColor, setAccentColor] = useState('#00E676'); // Vert gaming par défaut
+  const [isDarkMode, setIsDarkMode] = useState(true); 
+  const [accentColor, setAccentColor] = useState('#00E676'); 
 
   // Couleurs d'accent disponibles
   const accentColors = {

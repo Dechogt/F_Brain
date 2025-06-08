@@ -6,7 +6,6 @@ import CssBaseline from '@mui/material/CssBaseline'
 import App from './App.jsx'
 import { theme } from './styles/theme.js'
 import { AppProviders } from './contexts/index.jsx'
-import './index.css'
 
 // Configuration Auth0
 const auth0Config = {
@@ -19,7 +18,7 @@ const auth0Config = {
   },
   cacheLocation: 'localstorage',
   useRefreshTokens: true,
-};
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -38,4 +37,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </AppProviders>
     </Auth0Provider>
   </React.StrictMode>
-);
+)
