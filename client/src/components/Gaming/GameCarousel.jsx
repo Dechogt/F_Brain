@@ -55,22 +55,12 @@ const GameCarousel = () => {
             scrollSnapType: 'x mandatory'
           }}
         >
-          {games.map((game) => (
+          {games.map((game, index) => ( 
             <Box
-              ref={ref}
-              component={motion.div}
-              style={{ x }}
+              key={index} 
               sx={{
-                display: 'flex',
-                gap: 3,
-                px: 2, // Ajoute un padding horizontal
-                py: 4,
-                overflowX: 'auto', // Permet le défilement
-                scrollSnapType: 'x mandatory',
-                // Optionnel: Masquer la scrollbar si tu préfères
-                // '&::-webkit-scrollbar': { display: 'none' },
-                // '-ms-overflow-style': 'none',
-                // 'scrollbar-width': 'none',
+                flexShrink: 0,
+                scrollSnapAlign: 'start'
               }}
             >
               <GameBadge
