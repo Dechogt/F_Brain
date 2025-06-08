@@ -19,17 +19,8 @@ import {
   Toolbar,
 } from '@mui/material'
 import {
-  Home,
-  Leaderboard,
-  Dashboard,
-  Person,
-  Settings,
-  SportsEsports,
-  TrendingUp,
-  Group,
-  ChevronLeft,
-  ChevronRight,
-  Logout,
+  Home, Leaderboard, Dashboard, Person, Settings, SportsEsports,
+  TrendingUp, Group, ChevronLeft, ChevronRight, Logout,
 } from '@mui/icons-material'
 import { useAuth } from '../../hooks/useAuth.js'
 
@@ -39,12 +30,13 @@ import { useAuth } from '../../hooks/useAuth.js'
 
 // Reçoit les props du Layout
 export const Sidebar = ({
-  drawerWidth, // <-- Utilise cette prop
-  drawerWidthCollapsed, // <-- Utilise cette prop
+  drawerWidth,
+  drawerWidthCollapsed,
   collapsed,
   setCollapsed,
-  mobileOpen,
-  setMobileOpen,
+  mobileOpen, // État du mobile/coulissant drawer
+  setMobileOpen, // Fonction pour changer l'état
+  isSliding, // <-- Utilise cette prop
 }) => {
   const theme = useTheme()
   const navigate = useNavigate()
@@ -440,18 +432,21 @@ export const Sidebar = ({
 
   return (
     <>
-      {/* Desktop Drawer */}
-      {!isMobile && (
+      
+      {!isMobile && !isSliding && (
         <Drawer
           variant="permanent"
+          open={!isSliding} 
           sx={{
-            width: collapsed ? drawerWidthCollapsed : drawerWidth, // <-- Utilise les props ici
+            width: collapsed ? drawerWidthCollapsed : drawerWidth, 
             flexShrink: 0,
             '& .MuiDrawer-paper': {
-              width: collapsed ? drawerWidthCollapsed : drawerWidth, // <-- Utilise les props ici
+              width: collapsed ? drawerWidthCollapsed : drawerWidth, 
               boxSizing: 'border-box',
               transition: 'width 0.3s ease',
               overflowX: 'hidden',
+              
+              visibility: isSliding ? 'hidden' : 'visible', 
             },
           }}
         >
@@ -459,18 +454,17 @@ export const Sidebar = ({
         </Drawer>
       )}
 
-      {/* Mobile Drawer */}
-      {isMobile && (
+      {(isMobile || isSliding) && (
         <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={() => setMobileOpen(false)}
+          variant="temporary" 
+          open={isMobile ? mobileOpen : isSliding} 
+          onClose={() => setMobileOpen(false)} 
           ModalProps={{
             keepMounted: true,
           }}
           sx={{
             '& .MuiDrawer-paper': {
-              width: drawerWidth, // <-- Utilise la prop ici (largeur dépliée pour mobile)
+              width: drawerWidth, 
               boxSizing: 'border-box',
             },
           }}
@@ -482,4 +476,4 @@ export const Sidebar = ({
   );
 };
 
-export default Sidebar;
+export default Sidebar

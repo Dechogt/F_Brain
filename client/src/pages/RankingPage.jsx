@@ -2,6 +2,7 @@ import { Box, Typography, Container, Tabs, Tab, TextField, MenuItem } from '@mui
 import { useState } from 'react'
 import GamerGrid from '../components/Gaming/GamerGrid'
 import GameBadge from '../components/Gaming/GameBadge'
+import GamerCard from '../components/Gaming/GamerCard'
 import { motion } from 'framer-motion'
 
 const RankingPage = () => {

@@ -1,7 +1,7 @@
 import { Box, useMediaQuery, useTheme, styled, LinearProgress } from '@mui/material'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react' // Importe useRef
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -11,6 +11,8 @@ import useAuthUser from '../../hooks/useAuthUser' // Importe le hook
 // Définis les largeurs de la Sidebar ici pour les utiliser dans le Layout
 const DRAWER_WIDTH = 280
 const DRAWER_WIDTH_COLLAPSED = 70
+const DETECTION_ZONE_WIDTH = 20; // Largeur en pixels de la zone de détection sur le bord gauche
+
 
 // Style personnalisé pour le conteneur principal (qui contient Navbar et MainContent)
 // Ce conteneur prendra tout l'espace à droite de la Sidebar
@@ -29,22 +31,22 @@ const ContentWrapper = styled(Box)(({ theme, drawerWidth }) => ({
   },
 }));
 
-
-// Style personnalisé pour le contenu principal (qui contient les pages)
 const MainContent = styled(motion.main)(({ theme }) => ({
-  flexGrow: 1, // Permet au contenu principal de prendre l'espace restant sous la Navbar
+  flexGrow: 1, 
   padding: theme.spacing(3),
-  // Ajoute un padding top pour laisser de la place à la Navbar
-  // Utilise la hauteur de la Toolbar de Material UI (par défaut 64px sur desktop)
-  paddingTop: theme.mixins.toolbar.minHeight, // Utilise la hauteur de la toolbar du thème
-  width: '100%', // Assure qu'il prend 100% de la largeur de son parent (ContentWrapper)
-  // Retire les styles de centrage et maxWidth d'ici
-  // maxWidth: 1800,
-  // margin: '0 auto',
+  
+  paddingTop: theme.mixins.toolbar.minHeight, 
+  width: '100%',
+  maxWidth: 1800, 
+  margin: '0 auto', 
 
   [theme.breakpoints.down('md')]: {
     padding: theme.spacing(2),
     paddingTop: theme.mixins.toolbar.minHeight,
+    marginLeft: 0,
+    width: '100%',
+    maxWidth: '100%',
+    margin: '0 auto',
   }
 }))
 
@@ -64,7 +66,7 @@ const Layout = ({ children }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false) // État pour le Drawer mobile/coulissant
   const [isScrolled, setIsScrolled] = useState(false)
 
   const location = useLocation()
@@ -80,6 +82,9 @@ const Layout = ({ children }) => {
   // Affiche le spinner si Auth0 charge OU si useAuthUser charge
   const showLoadingSpinner = auth0Loading || userLoading;
 
+  // --- Ref pour la zone de détection de la souris ---
+  const detectionZoneRef = useRef(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
@@ -88,12 +93,50 @@ const Layout = ({ children }) => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Fermeture automatique du sidebar sur mobile (peut rester)
   useEffect(() => {
     if (isMobile && mobileOpen) {
       setMobileOpen(false)
     }
   }, [location, isMobile, mobileOpen])
+
+  // --- Effet pour gérer l'ouverture/fermeture du Drawer au passage de la souris ---
+  useEffect(() => {
+    
+    if (isMobile) return;
+
+    const handleMouseEnter = () => {
+      
+      if (!mobileOpen && collapsed) {
+         setMobileOpen(true);
+      }
+    };
+
+    const handleMouseLeave = () => {
+
+      if (mobileOpen) {
+         
+         setTimeout(() => {
+             
+             setMobileOpen(false);
+         }, 2000); // Délai en ms
+      }
+    };
+
+    // Attache les écouteurs d'événements à la zone de détection
+    const detectionZone = detectionZoneRef.current;
+    if (detectionZone) {
+      detectionZone.addEventListener('mouseenter', handleMouseEnter);
+      detectionZone.addEventListener('mouseleave', handleMouseLeave);
+    }
+
+    // Nettoyage des écouteurs d'événements
+    return () => {
+      if (detectionZone) {
+        detectionZone.removeEventListener('mouseenter', handleMouseEnter);
+        detectionZone.removeEventListener('mouseleave', handleMouseLeave);
+      }
+    };
+  }, [isMobile, mobileOpen, collapsed]); // Dépendances de l'effet
 
   // Fond animé gaming (peut rester)
   const getBackground = () => {
@@ -143,18 +186,37 @@ const Layout = ({ children }) => {
         }
       }}
     >
+      {/* --- Zone de détection de la souris --- */}
+      {!isMobile && ( // Affiche la zone seulement sur desktop
+        <Box
+          ref={detectionZoneRef} // Attache la ref
+          sx={{
+            position: 'fixed', // Fixée sur le bord gauche
+            top: 0,
+            left: 0,
+            height: '100vh',
+            width: DETECTION_ZONE_WIDTH, // Largeur de la zone de détection
+            zIndex: theme.zIndex.drawer + 2, // Au-dessus de la Sidebar permanente mais sous le Drawer temporaire
+            // Optionnel: background: 'rgba(255,0,0,0.1)', // Pour visualiser la zone en dev
+            cursor: 'pointer', // Indique que c'est interactif
+          }}
+        />
+      )}
       
       <Sidebar
         drawerWidth={DRAWER_WIDTH}
         drawerWidthCollapsed={DRAWER_WIDTH_COLLAPSED}
         collapsed={collapsed}
         setCollapsed={setCollapsed}
-        mobileOpen={mobileOpen}
-        setMobileOpen={setMobileOpen}
+        mobileOpen={mobileOpen} // Passe l'état du mobile drawer
+        setMobileOpen={setMobileOpen} // Passe la fonction pour changer l'état du mobile drawer
+        // Passe la prop pour indiquer si c'est le mode coulissant activé par la souris
+        isSliding={mobileOpen && !isMobile}
       />
 
+      {/* --- Nouveau conteneur pour Navbar et MainContent --- */}
       <ContentWrapper drawerWidth={currentDrawerWidth}>
-        
+        {/* Navbar */}
         <Navbar
           isScrolled={isScrolled}
           onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
@@ -168,7 +230,6 @@ const Layout = ({ children }) => {
           animate="visible"
           // drawerWidth={currentDrawerWidth} // Plus nécessaire ici, géré par ContentWrapper
         >
-        
           <AnimatePresence mode="wait">
             <PageTransition>
               {children}
@@ -177,6 +238,7 @@ const Layout = ({ children }) => {
         </MainContent>
       </ContentWrapper>
 
+      {/* Effets visuels gaming */}
       {[...Array(5)].map((_, i) => (
         <Box
           key={i}
