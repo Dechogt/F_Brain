@@ -71,18 +71,11 @@ const Layout = ({ children }) => {
 
   const location = useLocation()
   const { isLoading: auth0Loading } = useAuth0()
-  // --- Appelle useAuthUser au niveau supérieur du composant ---
+  
   const { loading: userLoading } = useAuthUser();
-  // ----------------------------------------------------------
 
-  // Détermine la largeur actuelle de la Sidebar
   const currentDrawerWidth = collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
-
-  // Logique de chargement combinée
-  // Affiche le spinner si Auth0 charge OU si useAuthUser charge
   const showLoadingSpinner = auth0Loading || userLoading;
-
-  // --- Ref pour la zone de détection de la souris ---
   const detectionZoneRef = useRef(null);
 
   useEffect(() => {
@@ -99,7 +92,6 @@ const Layout = ({ children }) => {
     }
   }, [location, isMobile, mobileOpen])
 
-  // --- Effet pour gérer l'ouverture/fermeture du Drawer au passage de la souris ---
   useEffect(() => {
     
     if (isMobile) return;
@@ -118,11 +110,11 @@ const Layout = ({ children }) => {
          setTimeout(() => {
              
              setMobileOpen(false);
-         }, 2000); // Délai en ms
+         }, 300); // Délai en ms
       }
     };
 
-    // Attache les écouteurs d'événements à la zone de détection
+   
     const detectionZone = detectionZoneRef.current;
     if (detectionZone) {
       detectionZone.addEventListener('mouseenter', handleMouseEnter);
@@ -186,19 +178,19 @@ const Layout = ({ children }) => {
         }
       }}
     >
-      {/* --- Zone de détection de la souris --- */}
-      {!isMobile && ( // Affiche la zone seulement sur desktop
+     
+      {!isMobile && ( 
         <Box
-          ref={detectionZoneRef} // Attache la ref
+          ref={detectionZoneRef}
           sx={{
-            position: 'fixed', // Fixée sur le bord gauche
+            position: 'fixed', 
             top: 0,
             left: 0,
             height: '100vh',
-            width: DETECTION_ZONE_WIDTH, // Largeur de la zone de détection
-            zIndex: theme.zIndex.drawer + 2, // Au-dessus de la Sidebar permanente mais sous le Drawer temporaire
+            width: DETECTION_ZONE_WIDTH, 
+            zIndex: theme.zIndex.drawer + 2, 
             // Optionnel: background: 'rgba(255,0,0,0.1)', // Pour visualiser la zone en dev
-            cursor: 'pointer', // Indique que c'est interactif
+            cursor: 'pointer', 
           }}
         />
       )}
@@ -208,9 +200,8 @@ const Layout = ({ children }) => {
         drawerWidthCollapsed={DRAWER_WIDTH_COLLAPSED}
         collapsed={collapsed}
         setCollapsed={setCollapsed}
-        mobileOpen={mobileOpen} // Passe l'état du mobile drawer
-        setMobileOpen={setMobileOpen} // Passe la fonction pour changer l'état du mobile drawer
-        // Passe la prop pour indiquer si c'est le mode coulissant activé par la souris
+        mobileOpen={mobileOpen} 
+        setMobileOpen={setMobileOpen} 
         isSliding={mobileOpen && !isMobile}
       />
 

@@ -34,9 +34,9 @@ export const Sidebar = ({
   drawerWidthCollapsed,
   collapsed,
   setCollapsed,
-  mobileOpen, // État du mobile/coulissant drawer
-  setMobileOpen, // Fonction pour changer l'état
-  isSliding, // <-- Utilise cette prop
+  mobileOpen, 
+  setMobileOpen, 
+  isSliding, 
 }) => {
   const theme = useTheme()
   const navigate = useNavigate()
