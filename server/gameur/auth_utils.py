@@ -4,22 +4,34 @@ from django.conf import settings
 from django.http import JsonResponse
 from functools import wraps
 from django.contrib.auth import get_user_model
-from .models import Gamer
+from .models import Gamer # Assure-toi que le modèle Gamer est importé
 
 # Cache pour les clés JWKS
 _jwks_client = None
 
 def get_jwks_client():
+    """
+    Récupère ou crée un client pour télécharger les clés JWKS.
+    """
     global _jwks_client
     if _jwks_client is None:
         print(f"Téléchargement clés JWKS depuis: {settings.AUTH0_JWKS_URL}")
-        response = requests.get(settings.AUTH0_JWKS_URL)
-        response.raise_for_status()
-        _jwks_client = jwt.PyJWKClient(settings.AUTH0_JWKS_URL)
-        print("Clés JWKS téléchargées et client créé.")
+        try:
+            response = requests.get(settings.AUTH0_JWKS_URL)
+            response.raise_for_status() # Lève une exception pour les erreurs HTTP
+            _jwks_client = jwt.PyJWKClient(settings.AUTH0_JWKS_URL)
+            print("Clés JWKS téléchargées et client créé.")
+        except Exception as e:
+            print(f"Erreur lors du téléchargement des clés JWKS: {e}")
+            _jwks_client = None # Assure que le client est None en cas d'erreur
+            raise # Relève l'exception pour qu'elle soit gérée plus haut
     return _jwks_client
 
 def validate_auth0_token(request):
+    """
+    Valide le token Auth0 de la requête et attache l'utilisateur Django.
+    Retourne l'utilisateur Django s'il est valide, None sinon.
+    """
     print("Début validation token")
     auth_header = request.headers.get('Authorization')
     print("Header Authorization:", auth_header)
@@ -51,10 +63,10 @@ def validate_auth0_token(request):
         payload = jwt.decode(
             token,
             signing_key,
-            algorithms=["RS256"],
-            audience=settings.AUTH0_API_AUDIENCE,
-            issuer=f'https://{settings.AUTH0_DOMAIN}/',
-            options={"verify_signature": True, "verify_exp": True}
+            algorithms=["RS256"], # L'algorithme utilisé par Auth0
+            audience=settings.AUTH0_API_AUDIENCE, # Vérifie l'audience
+            issuer=f'https://{settings.AUTH0_DOMAIN}/', # Vérifie l'émetteur
+            options={"verify_signature": True, "verify_exp": True} # Vérifie la signature et l'expiration
         )
         print("Token validé avec succès. Payload:", payload)
 
@@ -73,7 +85,7 @@ def validate_auth0_token(request):
             gamer = Gamer.objects.get(auth0_id=auth0_user_id)
             user = gamer.user
             print(f"Gamer trouvé: {gamer.pseudo}, Utilisateur Django: {user.username}")
-            request.user = user
+            request.user = user # Attache l'utilisateur Django à la requête
             return user
 
         except Gamer.DoesNotExist:
@@ -115,6 +127,9 @@ def validate_auth0_token(request):
         return None
 
 def auth0_required(view_func):
+    """
+    Décorateur de vue pour exiger un token Auth0 valide.
+    """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
         user = validate_auth0_token(request)

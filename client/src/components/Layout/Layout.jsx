@@ -1,29 +1,27 @@
 import { Box, useMediaQuery, useTheme, styled, LinearProgress } from '@mui/material'
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
-import { useState, useEffect, useRef } from 'react' // Importe useRef
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 import LoadingSpinner from '../Common/LoadingSpinner'
-import useAuthUser from '../../hooks/useAuthUser' // Importe le hook
+import useAuthUser from '../../hooks/useAuthUser' 
 
-// Définis les largeurs de la Sidebar ici pour les utiliser dans le Layout
 const DRAWER_WIDTH = 280
 const DRAWER_WIDTH_COLLAPSED = 70
-const DETECTION_ZONE_WIDTH = 20; // Largeur en pixels de la zone de détection sur le bord gauche
+const DETECTION_ZONE_WIDTH = 20 
 
-
-// Style personnalisé pour le conteneur principal (qui contient Navbar et MainContent)
-// Ce conteneur prendra tout l'espace à droite de la Sidebar
-const ContentWrapper = styled(Box)(({ theme, drawerWidth }) => ({
+export const ContentWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== 'drawerWidth' // en passant comme ceci react n'essaiee pas le DOM
+})(({ theme, drawerWidth }) => ({
   flexGrow: 1,
   display: 'flex',
   flexDirection: 'column',
   // Sur desktop, décale le wrapper de la largeur de la Sidebar
   [theme.breakpoints.up('md')]: {
     marginLeft: `${drawerWidth}px`,
-    width: `calc(100% - ${drawerWidth}px)`, // Optionnel, flexGrow suffit souvent
+    width: `calc(100% - ${drawerWidth}px)`,
   },
   [theme.breakpoints.down('md')]: {
     marginLeft: 0,
@@ -31,7 +29,7 @@ const ContentWrapper = styled(Box)(({ theme, drawerWidth }) => ({
   },
 }));
 
-const MainContent = styled(motion.main)(({ theme }) => ({
+export const MainContent = styled(motion.main)(({ theme }) => ({
   flexGrow: 1, 
   padding: theme.spacing(3),
   
@@ -50,7 +48,7 @@ const MainContent = styled(motion.main)(({ theme }) => ({
   }
 }))
 
-// Composant de transition entre les pages
+
 const PageTransition = ({ children }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -66,17 +64,17 @@ const Layout = ({ children }) => {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false) // État pour le Drawer mobile/coulissant
+  const [mobileOpen, setMobileOpen] = useState(false) 
   const [isScrolled, setIsScrolled] = useState(false)
 
   const location = useLocation()
   const { isLoading: auth0Loading } = useAuth0()
   
-  const { loading: userLoading } = useAuthUser();
+  const { loading: userLoading } = useAuthUser()
 
-  const currentDrawerWidth = collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH;
-  const showLoadingSpinner = auth0Loading || userLoading;
-  const detectionZoneRef = useRef(null);
+  const currentDrawerWidth = collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH
+  const showLoadingSpinner = auth0Loading || userLoading
+  const detectionZoneRef = useRef(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,41 +92,38 @@ const Layout = ({ children }) => {
 
   useEffect(() => {
     
-    if (isMobile) return;
+    if (isMobile) return
 
     const handleMouseEnter = () => {
       
       if (!mobileOpen && collapsed) {
-         setMobileOpen(true);
+        setMobileOpen(true)
       }
-    };
+    }
 
     const handleMouseLeave = () => {
 
       if (mobileOpen) {
-         
-         setTimeout(() => {
-             
-             setMobileOpen(false);
+        setTimeout(() => {
+            setMobileOpen(false)
          }, 300); // Délai en ms
       }
     };
 
-   
     const detectionZone = detectionZoneRef.current;
     if (detectionZone) {
-      detectionZone.addEventListener('mouseenter', handleMouseEnter);
-      detectionZone.addEventListener('mouseleave', handleMouseLeave);
+      detectionZone.addEventListener('mouseenter', handleMouseEnter)
+      detectionZone.addEventListener('mouseleave', handleMouseLeave)
     }
 
     // Nettoyage des écouteurs d'événements
     return () => {
       if (detectionZone) {
-        detectionZone.removeEventListener('mouseenter', handleMouseEnter);
-        detectionZone.removeEventListener('mouseleave', handleMouseLeave);
+        detectionZone.removeEventListener('mouseenter', handleMouseEnter)
+        detectionZone.removeEventListener('mouseleave', handleMouseLeave)
       }
-    };
-  }, [isMobile, mobileOpen, collapsed]); // Dépendances de l'effet
+    }
+  }, [isMobile, mobileOpen, collapsed])
 
   // Fond animé gaming (peut rester)
   const getBackground = () => {
@@ -151,10 +146,9 @@ const Layout = ({ children }) => {
     `
   }
 
-  // Affiche le spinner pleine page si showLoadingSpinner est vrai
-   if (showLoadingSpinner) {
-     return <LoadingSpinner isOverlay={true} />;
-   }
+  if (showLoadingSpinner) {
+    return <LoadingSpinner isOverlay={true} />
+  }
 
   return (
     <Box
@@ -205,21 +199,18 @@ const Layout = ({ children }) => {
         isSliding={mobileOpen && !isMobile}
       />
 
-      {/* --- Nouveau conteneur pour Navbar et MainContent --- */}
       <ContentWrapper drawerWidth={currentDrawerWidth}>
-        {/* Navbar */}
         <Navbar
           isScrolled={isScrolled}
           onMobileMenuToggle={() => setMobileOpen(!mobileOpen)}
           drawerWidth={currentDrawerWidth}
         />
 
-        {/* Contenu principal (les pages) */}
         <MainContent
           key={location.pathname}
           initial="hidden"
           animate="visible"
-          // drawerWidth={currentDrawerWidth} // Plus nécessaire ici, géré par ContentWrapper
+          // drawerWidth={currentDrawerWidth} 
         >
           <AnimatePresence mode="wait">
             <PageTransition>

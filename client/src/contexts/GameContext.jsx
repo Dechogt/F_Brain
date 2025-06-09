@@ -7,7 +7,7 @@ export const GameContextProvider = ({ children }) => {
   const { user, isAuthenticated, getAccessTokenSilently } = useAuth0()
   
   // États pour les données gaming
-  const [gamers, setGamers] = useState([]);
+  const [gamers, setGamers] = useState([])
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -26,13 +26,13 @@ export const GameContextProvider = ({ children }) => {
 
   // Récupérer le profil utilisateur avec useCallback
   const fetchUserProfile = useCallback(async () => {
-    if (!isAuthenticated || !user) return;
+    if (!isAuthenticated || !user) return
 
     try {
       setLoading(true);
       const token = await getAccessTokenSilently();
       
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profile/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -40,8 +40,8 @@ export const GameContextProvider = ({ children }) => {
       });
 
       if (response.ok) {
-        const profile = await response.json();
-        setUserProfile(profile);
+        const profile = await response.json()
+        setUserProfile(profile)
       }
     } catch (err) {
       setError('Erreur lors du chargement du profil')
@@ -67,17 +67,17 @@ export const GameContextProvider = ({ children }) => {
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/gamers/`, {
         headers,
-      });
+      })
 
       if (response.ok) {
         const gamersData = await response.json()
         setGamers(gamersData);
       }
     } catch (err) {
-      setError('Erreur lors du chargement des gamers');
-      console.error(err);
+      setError('Erreur lors du chargement des gamers')
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }, [isAuthenticated, getAccessTokenSilently])
 
@@ -89,7 +89,7 @@ export const GameContextProvider = ({ children }) => {
       setLoading(true);
       const token = await getAccessTokenSilently()
 
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profile/`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -100,8 +100,8 @@ export const GameContextProvider = ({ children }) => {
 
       if (response.ok) {
         const updatedProfile = await response.json()
-        setUserProfile(updatedProfile);
-        return updatedProfile;
+        setUserProfile(updatedProfile)
+        return updatedProfile
       }
     } catch (err) {
       setError('Erreur lors de la mise à jour du profil')
@@ -114,8 +114,8 @@ export const GameContextProvider = ({ children }) => {
   // Calculer le niveau d'un gamer basé sur ses stats
   const calculateLevel = (stats) => {
     if (!stats) return 1;
-    const totalXp = stats.wins * 100 + stats.kills * 10 + stats.assists * 5;
-    return Math.floor(totalXp / 1000) + 1;
+    const totalXp = stats.wins * 100 + stats.kills * 10 + stats.assists * 5
+    return Math.floor(totalXp / 1000) + 1
   };
 
   // Calculer le rang d'un gamer
@@ -135,10 +135,10 @@ export const GameContextProvider = ({ children }) => {
   // Charger les données au montage
   useEffect(() => {
     if (isAuthenticated) {
-      fetchUserProfile();
+      fetchUserProfile()
     }
-    fetchGamers();
-  }, [isAuthenticated, fetchUserProfile, fetchGamers]);
+    fetchGamers()
+  }, [isAuthenticated, fetchUserProfile, fetchGamers])
 
   const value = {
     // États

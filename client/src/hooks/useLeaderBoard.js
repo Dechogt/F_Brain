@@ -10,7 +10,7 @@ const useLeaderboard = (gameFilter) => {
     const fetchLeaderboard = async () => {
       try {
         setLoading(true)
-        const { data } = await axios.get(`/api/leaderboard?game=${gameFilter}`)
+        const { data } = await axios.get(`/api/gamers?game=${gameFilter}`)
         setPlayers(data.map((player, index) => ({
           ...player,
           rank: index + 1,

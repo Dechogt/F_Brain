@@ -1,87 +1,107 @@
-import React from 'react';
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import {Container, Box } from '@mui/material'
-import { useAuth0 } from '@auth0/auth0-react'
+import { Box } from '@mui/material' // Retire Container ici
+// Retire useAuth0 si tu ne l'utilises pas directement ici
+// import { useAuth0 } from '@auth0/auth0-react'
+
 import { LoadingSpinner } from './components/Common/LoadingSpinner'
 import { Sidebar } from './components/Layout/Sidebar'
 import { Navbar } from './components/Layout/Navbar'
+
+// Pages
 import HomePage from './pages/HomePage.jsx'
 import LoginPage from './pages/LoginPage'
 import RankingPage from './pages/RankingPage'
 import ProfilePage from './pages/ProfilePage'
-import ProtectedRoute from './components/Common/ProtectedRoute' 
+import ProtectedRoute from './components/Common/ProtectedRoute'
 
-// Hooks
-import useAuthUser from './hooks/useAuthUser.js'
+// --- Utilise le hook useAuth qui consomme AuthContext ---
+import { useAuth } from './hooks/useAuth'
+
+// Retire useAuthUser si tu l'as supprimé
+// import useAuthUser from './hooks/useAuthUser.js'
+// -------------------------------------------------------
+
+// Importe les composants stylisés du Layout
+import { ContentWrapper, MainContent } from './components/Layout/Layout' // Assure-toi que ces composants sont exportés depuis Layout.jsx
+
+// Définis les largeurs de la Sidebar ici aussi si tu ne les passes pas toutes en props
+// Ou importe-les depuis Layout.jsx si elles y sont définies
+const DRAWER_WIDTH = 280;
+const DRAWER_WIDTH_COLLAPSED = 70;
+
 
 function App() {
   
-  const { isLoading: auth0Loading, error: auth0Error } = useAuth0()
- 
-  const { loading: userLoading, error: userError } = useAuthUser() 
+  const { isLoading, error } = useAuth()
+  
+  // const { isLoading: auth0Loading, error: auth0Error } = useAuth0()
+  // const { loading: userLoading, error: userError } = useAuth()
 
-  // --- Console logs pour le débogage ---
-  console.log('App Loading State:')
-  console.log('  Auth0 isLoading:', auth0Loading)
-  console.log('  useAuthUser loading:', userLoading)
-  console.log('  Auth0 Error:', auth0Error)
-  console.log('  useAuthUser Error:', userError)
-  // -------------------------------------
+  // console.log('App Loading State:')
+  // console.log('  Auth0 isLoading:', auth0Loading)
+  // console.log('  useAuthUser loading:', userLoading)
+  // console.log('  Auth0 Error:', auth0Error)
+  // console.log('  useAuthUser Error:', userError)
 
-  // Affichage du loading pendant l'initialisation
-  // Affiche le spinner si Auth0 charge OU si useAuthUser charge
-  if (auth0Loading || userLoading) {
-    return <LoadingSpinner />
-  }
+  const [collapsed, setCollapsed] = useState(false) 
+  const currentDrawerWidth = collapsed ? DRAWER_WIDTH_COLLAPSED : DRAWER_WIDTH
 
-  // Si une erreur se produit (Auth0 ou useAuthUser)
-  if (auth0Error) {
-      console.error("Rendering Auth0 Error:", auth0Error); // Log l'erreur avant de l'afficher
-      return <div>Erreur d'authentification: {auth0Error.message}</div>
-  }
-  if (userError) {
-      console.error("Rendering User Data Error:", userError); // Log l'erreur avant de l'afficher
-      // Affiche un message d'erreur plus convivial pour l'utilisateur
-      return <div>Erreur lors du chargement des données utilisateur: {userError.message || 'Une erreur inconnue est survenue.'}</div>
-  }
+   if (isLoading) {
+     return <LoadingSpinner isOverlay={true} />
+   }
+
+  // Affiche l'erreur si error du hook useAuth est présent
+   if (error) {
+       console.error("Rendering App Error:", error)
+       return <div>Erreur de l'application: {error.message || 'Une erreur inconnue est survenue.'}</div>
+   }
 
   // Si tout a fini de charger et qu'il n'y a pas d'erreur
   return (
     <Router>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-        {/* Sidebar - Peut être conditionnel si l'utilisateur n'est pas connecté */}
-        {/* {isAuthenticated && <Sidebar />} */}
-        <Sidebar />
+        {/* Sidebar */}
+        {/* Passe les props nécessaires à Sidebar */}
+        <Sidebar
+           drawerWidth={DRAWER_WIDTH}
+           drawerWidthCollapsed={DRAWER_WIDTH_COLLAPSED}
+           collapsed={collapsed}
+           setCollapsed={setCollapsed}
+           // mobileOpen et setMobileOpen sont gérés dans Layout.jsx et passés à Sidebar
+           // mobileOpen={mobileOpen}
+           // setMobileOpen={setMobileOpen}
+           // isSliding={mobileOpen && !isMobile} 
+        />
 
-        {/* Contenu principal */}
-        <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Navbar - Peut être conditionnel */}
-          {/* {isAuthenticated && <Navbar />} */}
-          <Navbar />
+        {/* Conteneur principal (Navbar + Contenu des pages) */}
+        {/* Utilise le ContentWrapper du Layout */}
+        <ContentWrapper drawerWidth={currentDrawerWidth}>
+          
+          <Navbar
+             // isScrolled={isScrolled} // Si isScrolled est géré dans Layout
+             // onMobileMenuToggle={() => setMobileOpen(!mobileOpen)} // Si mobileOpen est géré dans App
+             drawerWidth={currentDrawerWidth}
+          />
 
-          {/* Contenu des pages */}
-          <Box
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: 3,
-              backgroundColor: 'background.default',
-              minHeight: 'calc(100vh - 64px)', // 64px = hauteur Navbar
-            }}
+          <MainContent
+            // key={location.pathname} // Si key est géré dans Layout
+            // initial="hidden" // Si animation est gérée dans Layout
+            // animate="visible" // Si animation est gérée dans Layout
           >
-            <Container maxWidth="lg">
+            {/* Retire le Container d'ici */}
+            {/* <Container maxWidth="lg"> */}
               <Routes>
                 {/* Routes publiques */}
                 <Route path="/" element={<HomePage />} />
-                {/* La page de login ne devrait être accessible que si non authentifié */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/ranking" element={<RankingPage />} />
 
-                {/* Routes protégées - Nécessitent une authentification */}
+                {/* Routes protégées */}
                 <Route
                   path="/profile"
                   element={
-                    <ProtectedRoute> {/* ProtectedRoute utilise useAuth0().isAuthenticated */}
+                    <ProtectedRoute>
                       <ProfilePage />
                     </ProtectedRoute>
                   }
@@ -108,9 +128,9 @@ function App() {
                   }
                 />
               </Routes>
-            </Container>
-          </Box>
-        </Box>
+            {/* </Container> */}
+          </MainContent>
+        </ContentWrapper>
       </Box>
     </Router>
   )
