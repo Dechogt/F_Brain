@@ -25,6 +25,13 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 
+# Exemple avec os.getenv
+AUTH0_DOMAIN = os.getenv('AUTH0_DOMAIN') # <-- Assure-toi que le nom de la variable correspond
+AUTH0_API_AUDIENCE = os.getenv('AUTH0_API_AUDIENCE') # Vérifie aussi celle-ci
+
+# L'URL JWKS est construite en utilisant AUTH0_DOMAIN
+AUTH0_JWKS_URL = f'https://{AUTH0_DOMAIN}/.well-known/jwks.json'
+
 
 # env = environ.Env(
 #     # Définis les types par défaut si les variables ne sont pas trouvées
@@ -74,7 +81,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'server_config.urls'

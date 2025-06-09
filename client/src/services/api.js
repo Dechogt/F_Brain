@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const API_BASE_URLH = '/api/v1/';
+const API_BASE_URLH = '/api/v1/'
 
 const api = axios.create({
   baseURL: API_BASE_URLH,
@@ -10,9 +10,9 @@ const api = axios.create({
 // Ajoute un token si besoin à l'avenir
 // api.interceptors.request.use(config => { ... });
 
-export const fetchGamers = () => api.get('gamers/');
-export const fetchLeaderboard = () => api.get('leaderboard/');
-export const fetchProfile = () => api.get('profile/');
-export const fetchGames = () => api.get('games/');
+export const fetchGamers = () => api.get('gamers/')
+export const fetchLeaderboard = () => api.get('leaderboard/')
+export const fetchProfile = () => api.get('profile/')
+export const fetchGames = () => api.get('games/')
 
-export const apiClient = api;
+export const apiClient = api

@@ -1,52 +1,48 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import {Container, Box } from '@mui/material';
-import { useAuth0 } from '@auth0/auth0-react';
-
-// Components
-import { LoadingSpinner } from './components/Common/LoadingSpinner'; 
-import { Sidebar } from './components/Layout/Sidebar';
-import { Navbar } from './components/Layout/Navbar';
-
-// Pages
-import HomePage from './pages/HomePage.jsx';
-import LoginPage from './pages/LoginPage';
-import RankingPage from './pages/RankingPage';
-import ProfilePage from './pages/ProfilePage';
-import ProtectedRoute from './components/Common/ProtectedRoute'; 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import {Container, Box } from '@mui/material'
+import { useAuth0 } from '@auth0/auth0-react'
+import { LoadingSpinner } from './components/Common/LoadingSpinner'
+import { Sidebar } from './components/Layout/Sidebar'
+import { Navbar } from './components/Layout/Navbar'
+import HomePage from './pages/HomePage.jsx'
+import LoginPage from './pages/LoginPage'
+import RankingPage from './pages/RankingPage'
+import ProfilePage from './pages/ProfilePage'
+import ProtectedRoute from './components/Common/ProtectedRoute' 
 
 // Hooks
-import useAuthUser from './hooks/useAuthUser.js';
+import useAuthUser from './hooks/useAuthUser.js'
 
 function App() {
-  // Récupère l'état de chargement et l'erreur d'Auth0
-  const { isLoading: auth0Loading, error: auth0Error } = useAuth0();
-  // Récupère l'état de chargement et l'erreur de ton hook useAuthUser
-  const { loading: userLoading, error: userError } = useAuthUser(); // <-- Utilise 'loading' et 'error' ici
+  
+  const { isLoading: auth0Loading, error: auth0Error } = useAuth0()
+ 
+  const { loading: userLoading, error: userError } = useAuthUser() 
 
   // --- Console logs pour le débogage ---
-  console.log('App Loading State:');
-  console.log('  Auth0 isLoading:', auth0Loading);
-  console.log('  useAuthUser loading:', userLoading);
-  console.log('  Auth0 Error:', auth0Error);
-  console.log('  useAuthUser Error:', userError);
+  console.log('App Loading State:')
+  console.log('  Auth0 isLoading:', auth0Loading)
+  console.log('  useAuthUser loading:', userLoading)
+  console.log('  Auth0 Error:', auth0Error)
+  console.log('  useAuthUser Error:', userError)
   // -------------------------------------
 
   // Affichage du loading pendant l'initialisation
   // Affiche le spinner si Auth0 charge OU si useAuthUser charge
   if (auth0Loading || userLoading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner />
   }
 
   // Si une erreur se produit (Auth0 ou useAuthUser)
   if (auth0Error) {
       console.error("Rendering Auth0 Error:", auth0Error); // Log l'erreur avant de l'afficher
-      return <div>Erreur d'authentification: {auth0Error.message}</div>;
+      return <div>Erreur d'authentification: {auth0Error.message}</div>
   }
   if (userError) {
       console.error("Rendering User Data Error:", userError); // Log l'erreur avant de l'afficher
       // Affiche un message d'erreur plus convivial pour l'utilisateur
-      return <div>Erreur lors du chargement des données utilisateur: {userError.message || 'Une erreur inconnue est survenue.'}</div>;
+      return <div>Erreur lors du chargement des données utilisateur: {userError.message || 'Une erreur inconnue est survenue.'}</div>
   }
 
   // Si tout a fini de charger et qu'il n'y a pas d'erreur
@@ -117,7 +113,7 @@ function App() {
         </Box>
       </Box>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App

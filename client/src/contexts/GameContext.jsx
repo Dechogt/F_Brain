@@ -1,16 +1,16 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import React, { createContext, useState, useEffect, useCallback } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 
-const GameContext = createContext();
+const GameContext = createContext()
 
 export const GameContextProvider = ({ children }) => {
-  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0()
   
   // États pour les données gaming
   const [gamers, setGamers] = useState([]);
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [userProfile, setUserProfile] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   // Genres de jeux disponibles
   const gameGenres = [
@@ -44,25 +44,25 @@ export const GameContextProvider = ({ children }) => {
         setUserProfile(profile);
       }
     } catch (err) {
-      setError('Erreur lors du chargement du profil');
-      console.error(err);
+      setError('Erreur lors du chargement du profil')
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [isAuthenticated, user, getAccessTokenSilently]);
+  }, [isAuthenticated, user, getAccessTokenSilently])
 
   // Récupérer la liste des gamers pour le classement avec useCallback
   const fetchGamers = useCallback(async () => {
     try {
-      setLoading(true);
-      const token = isAuthenticated ? await getAccessTokenSilently() : null;
+      setLoading(true)
+      const token = isAuthenticated ? await getAccessTokenSilently() : null
       
       const headers = {
         'Content-Type': 'application/json',
       };
       
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers['Authorization'] = `Bearer ${token}`
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/gamers/`, {
@@ -70,7 +70,7 @@ export const GameContextProvider = ({ children }) => {
       });
 
       if (response.ok) {
-        const gamersData = await response.json();
+        const gamersData = await response.json()
         setGamers(gamersData);
       }
     } catch (err) {
@@ -79,7 +79,7 @@ export const GameContextProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, getAccessTokenSilently]);
+  }, [isAuthenticated, getAccessTokenSilently])
 
   // Mettre à jour le profil utilisateur
   const updateUserProfile = async (profileData) => {
@@ -87,7 +87,7 @@ export const GameContextProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const token = await getAccessTokenSilently();
+      const token = await getAccessTokenSilently()
 
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/profile/`, {
         method: 'PUT',
@@ -99,15 +99,15 @@ export const GameContextProvider = ({ children }) => {
       });
 
       if (response.ok) {
-        const updatedProfile = await response.json();
+        const updatedProfile = await response.json()
         setUserProfile(updatedProfile);
         return updatedProfile;
       }
     } catch (err) {
-      setError('Erreur lors de la mise à jour du profil');
-      console.error(err);
+      setError('Erreur lors de la mise à jour du profil')
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
 
@@ -120,15 +120,15 @@ export const GameContextProvider = ({ children }) => {
 
   // Calculer le rang d'un gamer
   const calculateRank = (stats) => {
-    if (!stats) return 'Bronze';
-    const level = calculateLevel(stats);
+    if (!stats) return 'Bronze'
+    const level = calculateLevel(stats)
     
-    if (level >= 50) return 'Challenger';
-    if (level >= 40) return 'Master';
-    if (level >= 30) return 'Diamond';
-    if (level >= 20) return 'Platinum';
-    if (level >= 10) return 'Gold';
-    if (level >= 5) return 'Silver';
+    if (level >= 50) return 'Challenger'
+    if (level >= 40) return 'Master'
+    if (level >= 30) return 'Diamond'
+    if (level >= 20) return 'Platinum'
+    if (level >= 10) return 'Gold'
+    if (level >= 5) return 'Silver'
     return 'Bronze';
   };
 
@@ -166,4 +166,4 @@ export const GameContextProvider = ({ children }) => {
   );
 };
 
-export default GameContext;
+export default GameContext
