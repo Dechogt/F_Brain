@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
-import axios from 'axios'
+import { useEffect, useState, useCallback } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
+import axios from 'axios';
 
 const useAuthUser = () => {
-  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0()
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
+
+  // Mémoïser getAccessTokenSilently pour éviter les recréations inutiles
+  const memoizedGetToken = useCallback(async () => {
+    return await getAccessTokenSilently();
+  }, [getAccessTokenSilently]);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      // Si l'utilisateur n'est pas authentifié, on termine le chargement
-      // et on réinitialise les données et l'erreur
       if (!isAuthenticated) {
         setLoading(false);
         setUserData(null);
@@ -20,42 +23,37 @@ const useAuthUser = () => {
       }
 
       try {
-        setLoading(true); 
-        setError(null); 
+        setLoading(true);
+        setError(null);
 
-        const token = await getAccessTokenSilently();
+        const token = await memoizedGetToken();
 
-        const { data } = await axios.get('/api/user', {
+        const { data } = await axios.get('/api/user/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        // Met à jour les données utilisateur si la requête réussit
         setUserData(data);
 
       } catch (err) {
-        // En cas d'erreur lors de l'appel API
         console.error('Error fetching user data:', err);
-        setError(err); 
-        setUserData(null); 
+        setError(err);
+        setUserData(null);
       } finally {
-        
-        setLoading(false)
+        setLoading(false);
       }
     };
 
-    
     fetchUserData();
-  }, [isAuthenticated, user?.sub]); 
-
+  }, [isAuthenticated, user?.sub, memoizedGetToken]); // Ajout de memoizedGetToken aux dépendances
 
   return {
-    user: { ...user, ...userData }, 
+    user: { ...user, ...userData },
     isAuthenticated,
-    loading, 
-    error, 
+    loading,
+    error,
   };
 };
 
-export default useAuthUser
+export default useAuthUser;

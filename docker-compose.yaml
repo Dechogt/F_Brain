@@ -90,6 +90,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+    env_file:
+      - ./server/.env
     volumes:
       - ./server:/app
       - ./server/static:/app/static
