@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
               originalRequest.headers.Authorization = `Bearer ${freshToken}`
               // Important: Ne pas laisser l'intercepteur se déclencher à nouveau pour cette requête retry
               originalRequest._retry = true; // Marque la requête comme retry
-              return axios.request(originalRequest);
+              return axios.request(originalRequest)
             } else {
               console.error('AuthContext: getAccessTokenSilently n\'a pas renvoyé de nouveau token.')
               throw new Error('AuthContext: Impossible de renouveler le token.')
