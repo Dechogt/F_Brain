@@ -124,5 +124,3 @@ Nous accueillons les contributions ! Si vous souhaitez contribuer, veuillez suiv
 Ce projet a été realisé en vue d'une soutenance de la technologie DevOps
 
 ---
-
-N'hésitez pas à ajuster ce README pour qu'il corresponde parfaitement à votre projet et à votre style ! Ajoutez des sections si nécessaire (par exemple, comment exécuter les tests, comment configurer Auth0 plus en détail, etc.).
