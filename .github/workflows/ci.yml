@@ -402,18 +402,19 @@ jobs:
     - name: 🏗️ Build and push staging images
       run: |
         export IMAGE_TAG=staging-${{ github.sha }}
+        export REPO_NAME_LOWERCASE=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
         
         # Build all services
         docker compose build
         
         # Tag and push main services
-        docker tag gaming-followers-web:latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:$IMAGE_TAG
-        docker tag gaming-followers-frontend:latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:$IMAGE_TAG
-        docker tag gaming-followers-nginx:latest ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-nginx:$IMAGE_TAG
+        docker tag gaming-followers-web:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
+        docker tag gaming-followers-frontend:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG 
+        docker tag gaming-followers-nginx:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
         
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-web:$IMAGE_TAG
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:$IMAGE_TAG
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-nginx:$IMAGE_TAG
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG  
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
 
     - name: 🚀 Deploy notification
       run: |
