@@ -2,157 +2,123 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { useAuth0 } from '@auth0/auth0-react'
 import axios from 'axios'
 
-// Crée le contexte
 export const AuthContext = createContext()
 
-// Configuration de l'API (utilise import.meta.env)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost' 
-const NAMESPACE = import.meta.env.VITE_AUTH0_NAMESPACE
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost'
+const NAMESPACE = import.meta.env.VITE_AUTH0_NAMESPACE;
 
-// Composant fournisseur d'authentification
-export const AuthProvider = ({ children }) => { 
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+});
+
+// Variable pour suivre les requêtes en cours de retry
+const retryQueue = new Map()
+
+// Intercepteur de requête pour ajouter le token
+api.interceptors.request.use(
+  async (config) => {
+    const { isAuthenticated, getAccessTokenSilently } = useAuth0()// Accès au hook ici
+
+    // Ajoute le token seulement si l'utilisateur est authentifié
+    // et si l'URL de la requête commence par l'URL de base de ton API
+    // et si ce n'est pas une requête de retry (pour éviter les boucles)
+    if (isAuthenticated && config.url?.startsWith(API_BASE_URL + '/api') && !config._retry) {
+      try {
+        // Obtient le token silencieusement. Auth0 gère le rafraîchissement si nécessaire.
+        const token = await getAccessTokenSilently({
+          ...(import.meta?.env?.VITE_AUTH0_AUDIENCE && {
+            audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+          }),
+          // scope: 'openid profile email read:user read:profile', // Ajoute les scopes si nécessaire
+        });
+
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        } else {
+           // Si pas de token, la requête échouera avec 401, ce qui est attendu pour les routes protégées
+           console.warn('AuthContext: getAccessTokenSilently n\'a pas renvoyé de token pour la requête.')
+        }
+      } catch (err) {
+        console.error('AuthContext: Erreur lors de l\'obtention du token dans l\'intercepteur de requête:', err)
+        // Laisse la requête continuer, elle échouera probablement avec 401
+      }
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+);
+
+// Intercepteur de réponse pour gérer les 401
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Évite les boucles de retry infinies
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Marque la requête comme retry
+
+      try {
+        // Tente d'obtenir un nouveau token. L'intercepteur de requête le fera automatiquement.
+        // On rejoue simplement la requête originale.
+        console.log('AuthContext: Réponse 401 reçue. Tentative de rejouer la requête avec un nouveau token...')
+
+        // Rejoue la requête originale en utilisant l'instance axios configurée
+        // L'intercepteur de requête ajoutera le nouveau token
+        const response = await api.request(originalRequest)
+        console.log('AuthContext: Requête rejouée avec succès.')
+        return response
+
+      } catch (retryError) {
+        console.error('AuthContext: Échec du retry de la requête après 401:', retryError)
+        // Si le retry échoue, propage l'erreur
+        return Promise.reject(retryError)
+      }
+    }
+
+    // Pour les autres erreurs ou si c'est déjà une requête retry, propage l'erreur
+    return Promise.reject(error)
+  }
+)
+
+export const AuthProvider = ({ children }) => {
   const {
     user,
     isAuthenticated,
-    isLoading: auth0Loading, // Renommé pour éviter conflit
+    isLoading: auth0Loading,
     loginWithRedirect,
     logout,
     getAccessTokenSilently,
-    error: auth0Error, // Ajout de l'erreur Auth0
+    error: auth0Error,
   } = useAuth0()
 
-  // État pour le token API
-  const [apiToken, setApiToken] = useState(null)
-  // État pour les données du profil Gamer de ton backend
   const [userProfile, setUserProfile] = useState(null)
-  // État de chargement combiné (Auth0 + appel API)
-  const [loading, setLoading] = useState(true) // Commence à true car Auth0 charge au début
-  // État d'erreur combiné (Auth0 + appel API)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // --- Intercepteur Axios ---
-  // Cet intercepteur ajoute le token aux requêtes sortantes
+  // Effet pour gérer l'état de chargement global
   useEffect(() => {
-    const requestInterceptor = axios.interceptors.request.use(
-      (config) => {
-        // Ajoute le token seulement si l'utilisateur est authentifié et que le token est disponible
-        // et si l'URL de la requête commence par l'URL de base de ton API
-        if (isAuthenticated && apiToken && config.url?.startsWith(API_BASE_URL + '/api')) { 
-          config.headers.Authorization = `Bearer ${apiToken}`
-          console.log('AuthContext: Token ajouté aux headers:', apiToken.substring(0, 20) + '...')
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    )
-
-    // Cet intercepteur gère les réponses 401
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        // Si la réponse est 401 et que l'utilisateur est authentifié
-        if (error.response?.status === 401 && isAuthenticated) {
-          console.log('AuthContext: Réponse 401 reçue. Tentative de renouvellement du token...')
-          try {
-            // Tente d'obtenir un nouveau token (Auth0 gère le rafraîchissement si possible)
-            const freshToken = await getAccessTokenSilently({
-               // Ajoute l'audience si définie
-               ...(import.meta?.env?.VITE_AUTH0_AUDIENCE && {
-                 audience: import.meta.env.VITE_AUTH0_AUDIENCE
-               }),
-               // scope: 'read:user read:profile' // Ajoute les scopes si nécessaire
-            })
-
-            if (freshToken) {
-              console.log('AuthContext: Token renouvelé avec succès.')
-              setApiToken(freshToken) 
-
-              // Retry la requête originale avec le nouveau token
-              const originalRequest = error.config;
-              originalRequest.headers.Authorization = `Bearer ${freshToken}`
-              // Important: Ne pas laisser l'intercepteur se déclencher à nouveau pour cette requête retry
-              originalRequest._retry = true; // Marque la requête comme retry
-              return axios.request(originalRequest)
-            } else {
-              console.error('AuthContext: getAccessTokenSilently n\'a pas renvoyé de nouveau token.')
-              throw new Error('AuthContext: Impossible de renouveler le token.')
-            }
-
-          } catch (refreshError) {
-            console.error('AuthContext: Échec du renouvellement ou du retry:', refreshError)
-            // Si le renouvellement échoue, la session est probablement invalide
-            handleLogout() // Déconnexion forcée
-            // Propage l'erreur pour qu'elle soit gérée par le code appelant
-            return Promise.reject(refreshError)
-          }
-        }
-        // Pour les autres erreurs ou si l'utilisateur n'est pas authentifié, propage l'erreur
-        return Promise.reject(error)
-      }
-    );
-
-    // Nettoyage des intercepteurs
-    return () => {
-      axios.interceptors.request.eject(requestInterceptor)
-      axios.interceptors.response.eject(responseInterceptor)
+    // Le chargement global est terminé quand Auth0 a fini de charger
+    // et que la première tentative de récupération du profil utilisateur est faite
+    // (même si elle échoue avec 401, le spinner doit s'arrêter)
+    if (!auth0Loading) {
+        setLoading(false)
     }
-  }, [apiToken, isAuthenticated, getAccessTokenSilently, logout]); // Dépendances des intercepteurs
+  }, [auth0Loading])
 
-
-  // --- Fonction pour obtenir et définir le token initial ---
-  const getAndSetToken = useCallback(async () => {
-    // Obtient le token seulement si l'utilisateur est authentifié et que Auth0 a fini de charger
-    if (!isAuthenticated || auth0Loading) {
-        setApiToken(null) // Réinitialise le token si non authentifié ou Auth0 charge
-        return
-    }
-
-    try {
-      console.log('AuthContext: Tentative d\'obtention et définition du token initial...')
-      const tokenOptions = {
-        audience: import.meta?.env?.VITE_AUTH0_AUDIENCE || 'http://localhost/api',
-        scope: 'openid profile email', // Scopes de base
-        // Ajoute les scopes de ton API si nécessaire
-        // scope: 'openid profile email read:user read:profile',
-      }
-
-      const token = await getAccessTokenSilently(tokenOptions);
-      if (token) {
-        console.log('AuthContext: Token initial obtenu et défini.')
-        setApiToken(token)
-      } else {
-         console.warn('AuthContext: Token initial vide.')
-         setApiToken(null)
-      }
-    } catch (err) {
-      console.error('AuthContext: Erreur lors de l\'obtention du token initial:', err)
-      // Gérer l'erreur (ex: afficher un message, déconnecter)
-      setError(new Error('AuthContext: Impossible d\'obtenir le token initial.'))
-      setApiToken(null);
-    }
-  }, [isAuthenticated, auth0Loading, getAccessTokenSilently])
-
-  // --- Effet pour obtenir le token initial quand l'état d'authentification change ---
-  useEffect(() => {
-    getAndSetToken()
-  }, [getAndSetToken])
 
   const fetchUserProfile = useCallback(async () => {
-    // Récupère le profil seulement si l'utilisateur est authentifié et que le token API est disponible
-    if (!isAuthenticated || !apiToken) {
-        setUserProfile(null) // Réinitialise le profil si non authentifié ou pas de token
+    if (!isAuthenticated) {
+        setUserProfile(null)
         return
     }
 
     try {
       console.log('AuthContext: Appel API /user/ pour profil utilisateur...')
-      
-      // Assumes VITE_API_BASE_URL est l'origine (ex: http://localhost)
-      const apiUrl = `${API_BASE_URL}/user/`
-
-      // Axios utilisera automatiquement l'intercepteur pour ajouter le header Authorization
-      const response = await axios.get(apiUrl, {
-         timeout: 10000 // Délai d'attente pour la réponse API
+      // Utilise l'instance axios configurée avec les intercepteurs
+      const response = await api.get('/api/user/', {
+         timeout: 10000
       });
 
       console.log('AuthContext: Profil utilisateur récupéré:', response.data)
@@ -161,139 +127,128 @@ export const AuthProvider = ({ children }) => {
 
     } catch (err) {
       console.error('AuthContext: Erreur lors de la récupération du profil utilisateur:', err)
-      // L'intercepteur gère déjà les 401. Gérer les autres erreurs ici.
+      // L'intercepteur gère déjà les 401 et retries.
+      // Gérer les autres erreurs ici (404, 500, timeout, etc.)
       if (err.response?.status === 404) {
          setError(new Error('AuthContext: Profil utilisateur non trouvé dans le backend.'))
       } else if (err.response?.status === 500) {
          setError(new Error('AuthContext: Erreur serveur lors de la récupération du profil.'))
       } else if (err.code === 'ECONNABORTED') {
          setError(new Error('AuthContext: Délai d\'attente de récupération du profil dépassé.'))
-      } else {
+      } else if (err.response?.status !== 401) { // Évite de définir une erreur si c'est un 401 géré par l'intercepteur
          setError(err)
       }
       setUserProfile(null)
     }
-  }, [isAuthenticated, apiToken])
+  }, [isAuthenticated])
 
 
-  // --- Effet pour récupérer le profil utilisateur quand le token est disponible ---
+  // Effet pour récupérer le profil utilisateur quand l'utilisateur s'authentifie
   useEffect(() => {
-    fetchUserProfile()
-  }, [fetchUserProfile]) 
+    if (isAuthenticated) {
+        fetchUserProfile()
+    } else {
+        setUserProfile(null) // Réinitialise le profil si déconnecté
+    }
+  }, [isAuthenticated, fetchUserProfile])
 
 
-  // Fonction de déconnexion personnalisée
   const handleLogout = useCallback(() => {
     console.log('AuthContext: Déconnexion...')
-    setApiToken(null) 
-    setUserProfile(null) 
-    setError(null) 
-    logout({ returnTo: window.location.origin }) // Déconnexion via Auth0
-  }, [logout]) 
+    setUserProfile(null);
+    setError(null)
+    logout({ returnTo: window.location.origin })
+  }, [logout])
 
 
-  // Vérifier si l'utilisateur a un rôle spécifique (utilise l'objet user d'Auth0)
   const hasRole = useCallback((role) => {
-    if (!user || !user[`${NAMESPACE}/roles`]) return false
-    return user[`${NAMESPACE}/roles`].includes(role)
+    if (!user || !user[`${NAMESPACE}/roles`]) return false;
+    return user[`${NAMESPACE}/roles`].includes(role);
   }, [user, NAMESPACE])
 
-  // Vérifier si l'utilisateur a une permission spécifique (utilise l'objet user d'Auth0)
   const hasPermission = useCallback((permission) => {
     if (!user || !user[`${NAMESPACE}/permissions`]) return false
     return user[`${NAMESPACE}/permissions`].includes(permission)
   }, [user, NAMESPACE])
 
-  // Obtenir le token d'accès (expose la fonction getAccessTokenSilently)
   const getToken = useCallback(async () => {
-     // Utilise getAccessTokenSilently directement
      const tokenOptions = {
        audience: import.meta?.env?.VITE_AUTH0_AUDIENCE || 'http://localhost/api',
-       scope: 'openid profile email', // Scopes de base
-       // Ajoute les scopes de ton API si nécessaire
-       // scope: 'openid profile email read:user read:profile',
+       scope: 'openid profile email',
      };
      try {
-        return await getAccessTokenSilently(tokenOptions)
+        return await getAccessTokenSilently(tokenOptions);
      } catch (err) {
-        console.error('AuthContext: Erreur lors de l\'obtention du token via getToken:', err)
-        throw err
+        console.error('AuthContext: Erreur lors de l\'obtention du token via getToken:', err);
+        throw err;
      }
   }, [getAccessTokenSilently])
 
 
-  // Fonction pour faire un appel API sécurisé (utilise l'intercepteur)
   const secureApiCall = useCallback(async (url, options = {}) => {
-    // L'intercepteur gère déjà l'ajout du token et le renouvellement en cas de 401
     try {
-       const response = await axios({
-         url: `${API_BASE_URL}${url}`, 
-         ...options, 
+       // Utilise l'instance axios configurée
+       const response = await api({
+         url: `/api${url}`, 
+         ...options,
          headers: {
            'Content-Type': 'application/json',
-           ...options.headers 
+           ...options.headers
          },
-       })
-       return response.data
+       });
+       return response.data;
     } catch (err) {
        console.error('AuthContext: Erreur lors de l\'appel secureApiCall:', err)
-      
-       throw err 
+       throw err;
     }
-  }, []) 
+  }, []);
 
   const enrichedUser = user ? {
-    ...user, 
-    ...userProfile, 
+    ...user,
+    ...userProfile,
 
-    // Ajoute les propriétés calculées basées sur les données combinées
-    displayName: userProfile?.pseudo || user.name || user.nickname || user.email, 
-    avatar: userProfile?.avatar || user.picture, 
-    isAdmin: hasRole('admin'), 
-    isModerator: hasRole('moderator'), 
+    displayName: userProfile?.pseudo || user.name || user.nickname || user.email,
+    avatar: userProfile?.avatar || user.picture,
+    isAdmin: hasRole('admin'),
+    isModerator: hasRole('moderator'),
 
     level: userProfile?.level,
     points: userProfile?.points,
     topGames: userProfile?.topGames,
     favoriteGame: userProfile?.favoriteGame,
 
-  } : null
+  } : null;
 
   const combinedLoading = auth0Loading || loading
 
   const combinedError = auth0Error || error
 
-  // Valeurs exposées par le contexte
   const contextValue = {
-    // États combinés
-    user: enrichedUser, 
-    isAuthenticated, 
-    isLoading: combinedLoading, 
-    error: combinedError, 
+    user: enrichedUser,
+    isAuthenticated,
+    isLoading: combinedLoading,
+    error: combinedError,
 
-    // Données du profil Gamer 
     userProfile,
 
-    // Actions Auth0 de base
-    loginWithRedirect, 
-    logout: handleLogout, 
+    loginWithRedirect,
+    logout: handleLogout,
 
-    // Fonctions utilitaires
-    getToken, 
-    secureApiCall, 
-    hasRole, 
-    hasPermission, 
-    clearError: () => setError(null), 
+    getToken,
+    secureApiCall,
+    hasRole,
+    hasPermission,
+    clearError: () => setError(null),
   }
 
   return (
     <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
-export const useAuth = () => { 
+export const useAuth = () => {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
