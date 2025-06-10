@@ -44,7 +44,7 @@ AUTH0_JWKS_URL = f'https://{AUTH0_DOMAIN}/.well-known/jwks.json'
 SECRET_KEY = 'django-insecure-u2y)90@eilwlgqzkiqf(#7i4dh+@q=^%22^-0kugww(tjiw@0&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
