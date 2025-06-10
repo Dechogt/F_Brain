@@ -1,20 +1,20 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
+import { useAuth } from '../../hooks'
 import { Box, Typography, Button } from '@mui/material'
 import { LoginOutlined, SecurityOutlined } from '@mui/icons-material'
 import LoadingSpinner from './LoadingSpinner'
 
 const NAMESPACE = import.meta.env.VITE_AUTH0_NAMESPACE
+
 const ProtectedRoute = ({
   children,
   requiredRole = null,
   requiredPermission = null,
 }) => {
-  const { isAuthenticated, isLoading, user } = useAuth0()
+  const { isAuthenticated, isLoading, user } = useAuth()
   const location = useLocation()
 
-  // Namespace personnalisé pour les claims Auth0 (à adapter à ta config)
   const roles = user?.[`${NAMESPACE}/roles`] || []
   const permissions = user?.[`${NAMESPACE}/permissions`] || []
 

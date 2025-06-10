@@ -1,10 +1,10 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react'
 
 const ThemeContext = createContext();
 
 export const ThemeContextProvider = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(true); 
-  const [accentColor, setAccentColor] = useState('#00E676'); 
+  const [accentColor, setAccentColor] = useState('#00E676')
 
   // Couleurs d'accent disponibles
   const accentColors = {
@@ -18,11 +18,11 @@ export const ThemeContextProvider = ({ children }) => {
 
   // Sauvegarder les préférences dans localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem('gaming-theme');
+    const savedTheme = localStorage.getItem('gaming-theme')
     if (savedTheme) {
-      const { isDark, accent } = JSON.parse(savedTheme);
-      setIsDarkMode(isDark);
-      setAccentColor(accent);
+      const { isDark, accent } = JSON.parse(savedTheme)
+      setIsDarkMode(isDark)
+      setAccentColor(accent)
     }
   }, []);
 
@@ -34,11 +34,11 @@ export const ThemeContextProvider = ({ children }) => {
   }, [isDarkMode, accentColor]);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(prev => !prev);
+    setIsDarkMode(prev => !prev)
   };
 
   const changeAccentColor = (color) => {
-    setAccentColor(accentColors[color] || color);
+    setAccentColor(accentColors[color] || color)
   };
 
   const value = {
@@ -56,4 +56,4 @@ export const ThemeContextProvider = ({ children }) => {
   );
 };
 
-export default ThemeContext;
+export default ThemeContext

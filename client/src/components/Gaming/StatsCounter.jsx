@@ -39,7 +39,7 @@ const StatsCounter = () => {
     <Box sx={{ py: 8, backgroundColor: theme.palette.background.cards }}>
       <Grid container spacing={4} justifyContent="center">
         {stats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index} textAlign="center">
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index} sx={{ textAlign: 'center' }}>
             <Typography
               variant="h3"
               color="primary"

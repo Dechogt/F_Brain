@@ -28,7 +28,8 @@ import {
   SportsEsports,
   EmojiEvents,
 } from '@mui/icons-material'
-import { useAuth, useTheme as useCustomTheme } from '../../hooks'
+import { useAuth } from '../../hooks/useAuth'
+import { useCustomTheme } from '../../hooks/useTheme'
 import LoginButton from '../Auth/LoginButton'
 import LogoutButton from '../Auth/LogoutButton'
 import Profile from '../Auth/Profile'

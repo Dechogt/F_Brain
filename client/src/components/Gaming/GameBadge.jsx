@@ -1,8 +1,8 @@
 import { Box, Typography, LinearProgress, Avatar } from '@mui/material'
 import { motion } from 'framer-motion'
 
-const GameBadge = ({ game, level, hours }) => { // 'game' est la chaîne ici
-  const getGameColor = (gameName) => { // gameName est la chaîne passée
+const GameBadge = ({ game, level, hours }) => { 
+  const getGameColor = (gameName) => { 
     const colors = {
       'Valorant': '#FF4655',
       'League of Legends': '#0AC8B9',
@@ -10,8 +10,6 @@ const GameBadge = ({ game, level, hours }) => { // 'game' est la chaîne ici
       'Fortnite': '#C3B1E1',
       'Dota 2': '#E54D42'
     }
-    console.log(gameName) // gameName est la chaîne
-    // Utilise gameName pour chercher la couleur
     return colors[gameName] || '#9C27B0'
   }
 
