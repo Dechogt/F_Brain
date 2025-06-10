@@ -406,15 +406,15 @@ jobs:
         
         # Build all services
         docker compose build
+
+        docker tag f_brain-web:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG
+        docker tag f_brain-frontend:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG
+        docker tag f_brain-nginx:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
         
-        # Tag and push main services
-        docker tag gaming-followers-web:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
-        docker tag gaming-followers-frontend:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG 
-        docker tag gaming-followers-nginx:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
-        
-        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
-        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG  
-        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
+        # Push les images taggées
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG
 
     - name: 🚀 Deploy notification
       run: |
@@ -465,13 +465,15 @@ jobs:
         # Build all services
         docker compose build
         
-        docker tag gaming-followers-web:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
-        docker tag gaming-followers-frontend:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG 
-        docker tag gaming-followers-nginx:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
+        # Tag and push main services
+        docker tag f_brain-web:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
+        docker tag f_brain-frontend:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG 
+        docker tag f_brain-nginx:latest ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG 
         
-        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG 
-        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG  
-        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG  
+        # Push les images taggées
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-web:$IMAGE_TAG
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-frontend:$IMAGE_TAG
+        docker push ${{ env.REGISTRY }}/$REPO_NAME_LOWERCASE-nginx:$IMAGE_TAG
     - name: 🎉 Production deployment notification
       run: |
         echo "🚀 Production deployment completed!"
